@@ -6,8 +6,12 @@
 
 package jfgs.gui;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Date;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JTextField;
 import jfgs.logika.JFlickrGroupStats;
 
@@ -15,7 +19,7 @@ import jfgs.logika.JFlickrGroupStats;
  *
  * @author  michalus
  */
-public class StatsFrame extends javax.swing.JFrame {
+public class StatsFrame extends javax.swing.JFrame implements IStats {
 
     private KontrolerGUI kgui;
     
@@ -86,7 +90,13 @@ public class StatsFrame extends javax.swing.JFrame {
         initComponents();
         
         try {
-            kgui = new KontrolerGUI(postepOperacji, this, authLabel, groupIdField);
+            
+            kgui = new KontrolerGUI(
+                postepOperacji, 
+                this, 
+                authLabel, 
+                groupIdField);
+            
         } catch(Exception e) {
             e.printStackTrace();
             System.exit(-1);
@@ -131,10 +141,10 @@ public class StatsFrame extends javax.swing.JFrame {
 
         jLabel2.setText("Do:");
 
-        rokOd.setText("1900");
+        rokOd.setText("2008");
         rokOd.setInputVerifier(new TylkoPoprawnyRok());
 
-        rokDo.setText("1900");
+        rokDo.setText("2008");
         rokDo.setInputVerifier(new TylkoPoprawnyRok());
 
         jLabel3.setText("/");
@@ -142,8 +152,10 @@ public class StatsFrame extends javax.swing.JFrame {
         jLabel4.setText("/");
 
         miesiacOd.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
+        miesiacOd.setSelectedIndex(7);
 
         miesiacDo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
+        miesiacDo.setSelectedIndex(8);
 
         postepOperacji.setFocusable(false);
 
@@ -243,5 +255,21 @@ private void generujActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     private javax.swing.JTextField rokDo;
     private javax.swing.JTextField rokOd;
     // End of variables declaration//GEN-END:variables
+
+    public JFrame dajOwner() {
+        return this;
+    }
+
+    public Date dajDataOd() throws ParseException {
+        return 
+            DateFormat.getDateInstance(DateFormat.SHORT).parse(
+                "01."+miesiacOd.getSelectedItem()+"."+rokOd.getText());                
+    }
+
+    public Date dajDataDo() throws ParseException {
+        return
+            DateFormat.getDateInstance(DateFormat.SHORT).parse(
+                "01."+miesiacDo.getSelectedItem()+"."+rokDo.getText());        
+    }
 
 }
