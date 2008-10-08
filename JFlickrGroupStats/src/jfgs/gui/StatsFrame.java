@@ -9,7 +9,6 @@ package jfgs.gui;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
-import jfgs.logika.Constants;
 import jfgs.logika.JFlickrGroupStats;
 
 /**
@@ -64,9 +63,21 @@ public class StatsFrame extends javax.swing.JFrame {
         miesiacOd.setEditable(czyDoEdycji);
         miesiacDo.setEditable(czyDoEdycji);
         rokOd.setEditable(czyDoEdycji);
-        rokDo.setEditable(czyDoEdycji);    
+        rokDo.setEditable(czyDoEdycji);
+        groupIdField.setEditable(czyDoEdycji);
+                        
+        {
+            Thread t = new Thread() {
+
+                @Override
+                public void run() {
+                    new JFlickrGroupStats(kgui.getGroupId(), kgui);
+                }
                 
-        JFlickrGroupStats jfgs = new JFlickrGroupStats(Constants.groupId, kgui);
+            };
+            t.start();
+        }
+        
     }
     
     /** Creates new form StatsFrame */
@@ -75,7 +86,7 @@ public class StatsFrame extends javax.swing.JFrame {
         initComponents();
         
         try {
-            kgui = new KontrolerGUI(postepOperacji, this, authLabel);
+            kgui = new KontrolerGUI(postepOperacji, this, authLabel, groupIdField);
         } catch(Exception e) {
             e.printStackTrace();
             System.exit(-1);
@@ -109,6 +120,8 @@ public class StatsFrame extends javax.swing.JFrame {
         postepOperacji = new javax.swing.JProgressBar();
         generuj = new javax.swing.JButton();
         authLabel = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        groupIdField = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("JFlickrGroupStats");
@@ -143,6 +156,10 @@ public class StatsFrame extends javax.swing.JFrame {
 
         authLabel.setText("...");
 
+        jLabel5.setText("Grupa:");
+
+        groupIdField.setText("71956997@N00");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -158,7 +175,11 @@ public class StatsFrame extends javax.swing.JFrame {
                         .addGap(3, 3, 3)
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(miesiacOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(miesiacOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel5)
+                        .addGap(18, 18, 18)
+                        .addComponent(groupIdField, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel2)
@@ -182,7 +203,9 @@ public class StatsFrame extends javax.swing.JFrame {
                     .addComponent(jLabel1)
                     .addComponent(rokOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3)
-                    .addComponent(miesiacOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(miesiacOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5)
+                    .addComponent(groupIdField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(rokDo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -208,10 +231,12 @@ private void generujActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel authLabel;
     private javax.swing.JButton generuj;
+    private javax.swing.JTextField groupIdField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JComboBox miesiacDo;
     private javax.swing.JComboBox miesiacOd;
     private javax.swing.JProgressBar postepOperacji;

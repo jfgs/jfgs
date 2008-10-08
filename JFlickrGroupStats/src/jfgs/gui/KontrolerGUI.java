@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
+import javax.swing.JTextField;
 import javax.xml.parsers.ParserConfigurationException;
 import jfgs.logika.Autoryzer;
 import org.xml.sax.SAXException;
@@ -27,11 +28,16 @@ public class KontrolerGUI {
     private JFrame owner;
     private Autoryzer autoryzer;
     private JLabel authLabel;
+    private JTextField groupIdField;
     
-    public KontrolerGUI(JProgressBar pasekPostepu, JFrame owner, JLabel authLabel) throws ParserConfigurationException {
+    public KontrolerGUI(JProgressBar pasekPostepu, JFrame owner, 
+        JLabel authLabel, JTextField groupIdField) 
+        throws ParserConfigurationException 
+    {
         this.pasekPostepu = pasekPostepu;
         this.owner = owner;
         this.authLabel = authLabel;
+        this.groupIdField = groupIdField;
         this.autoryzer = Autoryzer.get();
     }
     
@@ -51,6 +57,7 @@ public class KontrolerGUI {
      */
     public void ustawPostep(int postep) {
         pasekPostepu.setValue(postep);
+        pasekPostepu.repaint();
     }
     
     /**
@@ -63,6 +70,10 @@ public class KontrolerGUI {
     
     public void ustawAuth(String str) {
         authLabel.setText(str);
+    }
+    
+    public String getGroupId() {
+        return groupIdField.getText();
     }
     
 }

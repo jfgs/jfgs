@@ -5,36 +5,21 @@
 
 package jfgs.logika;
 
-import com.aetrion.flickr.Flickr;
-import com.aetrion.flickr.FlickrException;
-import com.aetrion.flickr.REST;
-import com.aetrion.flickr.RequestContext;
-import com.aetrion.flickr.auth.Auth;
-import com.aetrion.flickr.auth.Permission;
 import com.aetrion.flickr.groups.Group;
 import com.aetrion.flickr.groups.GroupsInterface;
 import com.aetrion.flickr.groups.pools.PoolsInterface;
 import com.aetrion.flickr.photos.PhotoList;
-import com.aetrion.flickr.util.AuthStore;
 import java.io.IOException;
-import com.aetrion.flickr.util.FileAuthStore;
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Iterator;
-import org.xml.sax.SAXException;
 import com.aetrion.flickr.photos.Photo;
 import com.aetrion.flickr.photos.comments.CommentsInterface;
 import java.util.Collection;
 import java.util.HashMap;
 import com.aetrion.flickr.photos.comments.Comment;
-import java.awt.Desktop;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.net.URI;
 import java.text.NumberFormat;
 import java.util.Arrays;
-import javax.swing.JOptionPane;
 import jfgs.gui.KontrolerGUI;
 
 /**
@@ -98,17 +83,21 @@ public class JFlickrGroupStats {
         nf.setMaximumFractionDigits(0);
         nf.setMinimumIntegerDigits(3);
         
+        int liczbaWszystkichZdjec = 0;
+        
         try {
 
             GroupsInterface gi = kgui.getFlickr().getGroupsInterface();
             Group g = gi.getInfo(groupId);
 
             drukuj("Grupa: " + g.getName());
-
+            
             g.getMembers();
 
             PoolsInterface pi = kgui.getFlickr().getPoolsInterface();
             PhotoList listaZdjec = pi.getPhotos(groupId, new String[]{}, 500, 1);
+            
+            liczbaWszystkichZdjec = listaZdjec.getTotal();
 
             CommentsInterface ci = kgui.getFlickr().getCommentsInterface();
 
@@ -120,6 +109,19 @@ public class JFlickrGroupStats {
             while (i.hasNext()) {
 
                 numerZdjecia++;
+                
+                /*
+                 * Przesuwamy pasek postępu
+                 */                
+                if (liczbaWszystkichZdjec == 0) {
+                    kgui.ustawPostep(0);
+                } else {                    
+                    kgui.ustawPostep(
+                        (int) Math.round(
+                            (double) numerZdjecia 
+                                / (double) liczbaWszystkichZdjec
+                                * 100));
+                }
 
                 Photo p = (Photo) i.next();
 
