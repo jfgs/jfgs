@@ -104,6 +104,7 @@ public class JFlickrGroupStats {
             HashMap<String, Stats> aktywnosc = new HashMap<String, Stats>();
 
             Iterator i = listaZdjec.iterator();
+            
             int numerZdjecia = 0;
 
             while (i.hasNext()) {
@@ -141,65 +142,51 @@ public class JFlickrGroupStats {
                 Collection komentarze = ci.getList(p.getId());
                 Iterator ic = komentarze.iterator();
                 
-//                {
-//                    Date d = p.getDateAdded();
-//                    
-//                    boolean drukujDate = false;
-//                    int miesiac = d.getMonth();
-//                    int rok = d.getYear();
-//                    
-//                    if (ostatniRok == -1 && ostatniMiesiac == -1) {
-//                        drukujDate = true;
-//                    } else if (ostatniMiesiac != miesiac && ostatniRok != rok) {
-//                        drukujDate = true;
-//                        ostatniMiesiac = miesiac;
-//                        ostatniRok = rok;
-//                    }
-//
-//                    if (drukujDate) {
-//                        drukuj(
-//                            "<i>Miesiąc: "
-//                            + rok
-//                            + "/" 
-//                            + miesiac
-//                            + "</i>\n");
-//                    }
-//                }
+                if (!p.getDateAdded().after(kgui.dajDataOd()) 
+                        || !p.getDateAdded().before(kgui.dajDataDo()))
+                {
+                    
+                    // zdjęcie poza zakresem badanych dat
+                    
+                } else {
                 
-                drukuj(
-                    nf.format(numerZdjecia) 
-                    + ": " 
-                    + "<a href=\"" 
-                    + p.getUrl() 
-                    + "\">" 
-                    + nazwaZdjecia 
-                    + "</a>" 
-                    + " by " 
-                    + p.getOwner().getUsername() 
-                    + " (" 
-                    + (komentarze.size() == 0 ? "<b>" + komentarze.size() + "</b>" : "" + komentarze.size())
-                    + ")" );
+                    drukuj(
+                        nf.format(numerZdjecia) 
+                        + ": " 
+                        + "<a href=\"" 
+                        + p.getUrl() 
+                        + "\">" 
+                        + nazwaZdjecia 
+                        + "</a>" 
+                        + " by " 
+                        + p.getOwner().getUsername() 
+                        + " (" 
+                        + (komentarze.size() == 0 ? "<b>" + komentarze.size() + "</b>" : "" + komentarze.size())
+                        + ")" 
+                        + ", "
+                        + p.getDateAdded());
 
-                while (ic.hasNext()) {
-                    Comment komentarz = (Comment) ic.next();
+                    while (ic.hasNext()) {
 
-                    if (p.getOwner().getId().equals(komentarz.getAuthor())) {
-                        // Swoich komentarzy nie liczymy
-                    } else {
-                        if (aktywnosc.containsKey(komentarz.getAuthor())) {
-                            Stats s = aktywnosc.get(komentarz.getAuthor());
-                            s.dodajKomentarz();
-                            aktywnosc.put(komentarz.getAuthor(), s);
+                        Comment komentarz = (Comment) ic.next();
+
+                        if (p.getOwner().getId().equals(komentarz.getAuthor())) {
+                            // Swoich komentarzy nie liczymy
                         } else {
-                            aktywnosc.put(komentarz.getAuthor(), new Stats(1, 0, komentarz.getAuthorName()));
+                            if (aktywnosc.containsKey(komentarz.getAuthor())) {
+                                Stats s = aktywnosc.get(komentarz.getAuthor());
+                                s.dodajKomentarz();
+                                aktywnosc.put(komentarz.getAuthor(), s);
+                            } else {
+                                aktywnosc.put(komentarz.getAuthor(), new Stats(1, 0, komentarz.getAuthorName()));
+                            }
                         }
-                    }
-                }
 
-                //if (numerZdjecia>10) {
-                //    break;
-                //}
-            }
+                    } // komentarze
+                
+                } // w zakresie dat
+
+            } // zdjęcia
 
             int maksymalnaWartosc = Integer.MIN_VALUE;
             int minimalnaWartosc = Integer.MAX_VALUE;

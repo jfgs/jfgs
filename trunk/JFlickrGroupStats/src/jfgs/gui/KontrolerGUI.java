@@ -9,6 +9,8 @@ import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.FlickrException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.util.Date;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
@@ -25,19 +27,19 @@ import org.xml.sax.SAXException;
 public class KontrolerGUI {
     
     private JProgressBar pasekPostepu;
-    private JFrame owner;
+    private IStats stats;
     private Autoryzer autoryzer;
     private JLabel authLabel;
     private JTextField groupIdField;
     
-    public KontrolerGUI(JProgressBar pasekPostepu, JFrame owner, 
+    public KontrolerGUI(JProgressBar pasekPostepu, IStats stats, 
         JLabel authLabel, JTextField groupIdField) 
         throws ParserConfigurationException 
     {
         this.pasekPostepu = pasekPostepu;
-        this.owner = owner;
+        this.stats = stats;
         this.authLabel = authLabel;
-        this.groupIdField = groupIdField;
+        this.groupIdField = groupIdField;        
         this.autoryzer = Autoryzer.get();
     }
     
@@ -65,7 +67,7 @@ public class KontrolerGUI {
      * @return
      */
     public JFrame getOwner() {
-        return owner;
+        return stats.dajOwner();
     }
     
     public void ustawAuth(String str) {
@@ -74,6 +76,14 @@ public class KontrolerGUI {
     
     public String getGroupId() {
         return groupIdField.getText();
+    }
+    
+    public Date dajDataOd() throws ParseException {
+        return stats.dajDataOd();
+    }
+    
+    public Date dajDataDo() throws ParseException {
+        return stats.dajDataDo();
     }
     
 }
