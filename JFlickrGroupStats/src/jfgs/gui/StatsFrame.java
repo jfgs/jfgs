@@ -56,21 +56,9 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
     /**
      * Akcja głównego guzika
      */
-    private void akcjaGeneruj() {
+    private void akcjaGeneruj() {        
         stanKomponentów(false);
-    }
-    
-    /**
-     * Włączenie/wyłączenie edycji edytowalnych komponentów na formularzu
-     * @param czyDoEdycji
-     */
-    private void stanKomponentów(boolean czyDoEdycji) {        
-        miesiacOd.setEditable(czyDoEdycji);
-        miesiacDo.setEditable(czyDoEdycji);
-        rokOd.setEditable(czyDoEdycji);
-        rokDo.setEditable(czyDoEdycji);
-        groupIdField.setEditable(czyDoEdycji);
-                        
+        
         {
             Thread t = new Thread() {
 
@@ -81,8 +69,20 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
                 
             };
             t.start();
-        }
-        
+        }        
+    }
+    
+    /**
+     * Włączenie/wyłączenie edycji edytowalnych komponentów na formularzu
+     * @param czyDoEdycji
+     */
+    private void stanKomponentów(boolean czyDoEdycji) {        
+        miesiacOd.setEnabled(czyDoEdycji);
+        miesiacDo.setEnabled(czyDoEdycji);
+        rokOd.setEditable(czyDoEdycji);
+        rokDo.setEditable(czyDoEdycji);
+        groupIdField.setEditable(czyDoEdycji);
+        generuj.setEnabled(czyDoEdycji);        
     }
     
     /** Creates new form StatsFrame */
