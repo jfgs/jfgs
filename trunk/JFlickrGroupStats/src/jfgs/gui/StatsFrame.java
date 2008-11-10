@@ -8,6 +8,7 @@ package jfgs.gui;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
@@ -107,6 +108,24 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         } catch(Exception e) {
             e.printStackTrace();
             System.exit(-1);
+        }
+        
+        /*
+         * Inicjujemy daty na miesiąc przed miesiącem bieżącym
+         */
+        {
+            Calendar c = Calendar.getInstance();
+            
+            rokDo.setText(""+c.get(Calendar.YEAR));
+            miesiacDo.setSelectedIndex(c.get(Calendar.MONTH));
+            
+            if (c.get(Calendar.MONTH) == Calendar.DECEMBER) {
+                rokOd.setText(""+(c.get(Calendar.YEAR)-1));
+                miesiacOd.setSelectedIndex(Calendar.JANUARY);
+            } else {
+                rokOd.setText(""+c.get(Calendar.YEAR));
+                miesiacOd.setSelectedIndex(c.get(Calendar.MONTH)-1);
+            }
         }
     }
 
