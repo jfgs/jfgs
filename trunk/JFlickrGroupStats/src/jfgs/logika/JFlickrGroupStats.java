@@ -269,8 +269,10 @@ public class JFlickrGroupStats {
                 Object[] st = aktywnosc.values().toArray();
                 Arrays.sort(st);
 
+                drukujNaglowekOcen();
+                
                 for (Object o : st) {                    
-                    printBar(
+                    drukujPasekOcen(
                         (Stats) o, 
                         minimalnaWartosc, 
                         maksymalnaWartosc);                    
@@ -290,17 +292,31 @@ public class JFlickrGroupStats {
     }
     
     /**
-     * Słupek z punktacją
-     * @param s
-     * @param minimalna
-     * @param maksymalna
+     * Nagłówek dla słupka z punktacją     
      */
-    private void printBar(Stats s, int minimalna, int maksymalna) {
+    private void drukujNaglowekOcen() {
+        pasekOcen(null, 0, 0, true);
+    }
+    
+    /**
+     * Słupek z punktacją
+     * @param s tablica ocen
+     * @param minimalna wartość dla funkcji oceny
+     * @param maksymalna wartość dla funkcji oceny
+     */
+    private void drukujPasekOcen(Stats s, int minimalna, int maksymalna) {
+        pasekOcen(s, minimalna, maksymalna, false);
+    }    
+    
+    /*
+     * Narzędziowa funkcja drukująca pasek lub nagłówek
+     */
+    private void pasekOcen(Stats s, int minimalna, int maksymalna, boolean czyNaglowek) {
         
         /*
          * Użytkowników nie dodających zdjęć nie drukujemy
          */
-        if (s.dajLiczbeZdjec() == 0) {
+        if (!czyNaglowek && s.dajLiczbeZdjec() == 0) {
             return;
         }
         
@@ -311,7 +327,13 @@ public class JFlickrGroupStats {
         /*
          * Nazwa użytkownika
          */
-        String uzytkownik = s.dajNazwe().trim();
+        String uzytkownik = "";
+        if (czyNaglowek) {
+            uzytkownik = "Użytkownik";
+        } else {
+            uzytkownik = s.dajNazwe().trim();
+        }
+        
         if (uzytkownik.length()>dlugoscUyztkownika) {
             uzytkownik = uzytkownik.substring(0, dlugoscUyztkownika);
         }
@@ -324,11 +346,16 @@ public class JFlickrGroupStats {
         /*
          * Długość słupka i rysowanie słupka
          */
-        double p = 
-            ((double) (s.dajWartosc() - minimalna) 
-                / (double) (maksymalna - minimalna))
-            * dlugoscBelki;
-        p = Math.round(p);
+        double p = 0;
+        if (!czyNaglowek) {
+            p = 
+                ((double) (s.dajWartosc() - minimalna) 
+                    / (double) (maksymalna - minimalna))
+                * dlugoscBelki;
+            p = Math.round(p);
+        } else {
+            p = 0;
+        }
         
         for (int i=0; i<dlugoscBelki; i++) {
             if (i<p) {
@@ -338,16 +365,24 @@ public class JFlickrGroupStats {
             }                    
         }
         
-        /*
-         * Punktacja
-         */
-        linia = linia 
-            + " [" 
-            + s.dajLiczbeKomentarzy() 
-            + "/" 
-            + s.dajLiczbeZdjec()
-            + ":" 
-            + s.dajWartosc()+"]";        
+        if (!czyNaglowek) {
+            /*
+             * Punktacja
+             */
+            linia = linia 
+                + " [" 
+                + s.dajLiczbeKomentarzy() 
+                + "/" 
+                + s.dajLiczbeZdjec()
+                + "/" 
+                + s.dajWartosc()+"]";
+        } else {
+            linia = linia 
+                + " [komentarze"                 
+                + "/zdjęcia"                 
+                + "/wartość" 
+                +"]";
+        }
         
         drukuj(linia);
         
