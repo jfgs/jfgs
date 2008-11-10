@@ -120,8 +120,7 @@ public class JFlickrGroupStats {
 
             while (i.hasNext()) {
 
-                numerZdjeciaWPuli++;
-                numerPrzetwarzanegoZdjecia++;
+                numerZdjeciaWPuli++;                
                 
                 /*
                  * Przesuwamy pasek postępu
@@ -161,6 +160,8 @@ public class JFlickrGroupStats {
                     // zdjęcie poza zakresem badanych dat
                     
                 } else {
+                    
+                    numerPrzetwarzanegoZdjecia++;
                 
                     drukuj(
                         nf.format(numerPrzetwarzanegoZdjecia) 
