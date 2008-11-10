@@ -83,7 +83,10 @@ public class JFlickrGroupStats {
         nf.setMaximumFractionDigits(0);
         nf.setMinimumIntegerDigits(3);
         
-        int liczbaWszystkichZdjec = 0;
+        /*
+         * Wszystkie zdjęcia w puli
+         */ 
+        int liczbaWszystkichZdjecPuli = 0;
         
         try {
 
@@ -97,7 +100,7 @@ public class JFlickrGroupStats {
             PoolsInterface pi = kgui.getFlickr().getPoolsInterface();
             PhotoList listaZdjec = pi.getPhotos(groupId, new String[]{}, 500, 1);
             
-            liczbaWszystkichZdjec = listaZdjec.getTotal();
+            liczbaWszystkichZdjecPuli = listaZdjec.getTotal();
 
             CommentsInterface ci = kgui.getFlickr().getCommentsInterface();
 
@@ -105,22 +108,31 @@ public class JFlickrGroupStats {
 
             Iterator i = listaZdjec.iterator();
             
-            int numerZdjecia = 0;
+            /*
+             * Numer zdjęcia w puli zdjęć
+             */
+            int numerZdjeciaWPuli = 0;
+            
+            /*
+             * Numer zdjęcia w zakresie kryteriów przeszukiwania
+             */
+            int numerPrzetwarzanegoZdjecia = 0;
 
             while (i.hasNext()) {
 
-                numerZdjecia++;
+                numerZdjeciaWPuli++;
+                numerPrzetwarzanegoZdjecia++;
                 
                 /*
                  * Przesuwamy pasek postępu
                  */                
-                if (liczbaWszystkichZdjec == 0) {
+                if (liczbaWszystkichZdjecPuli == 0) {
                     kgui.ustawPostep(0);
                 } else {                    
                     kgui.ustawPostep(
                         (int) Math.round(
-                            (double) numerZdjecia 
-                                / (double) liczbaWszystkichZdjec
+                            (double) numerZdjeciaWPuli 
+                                / (double) liczbaWszystkichZdjecPuli
                                 * 100));
                 }
 
@@ -151,7 +163,7 @@ public class JFlickrGroupStats {
                 } else {
                 
                     drukuj(
-                        nf.format(numerZdjecia) 
+                        nf.format(numerPrzetwarzanegoZdjecia) 
                         + ": " 
                         + "<a href=\"" 
                         + p.getUrl() 
@@ -161,7 +173,9 @@ public class JFlickrGroupStats {
                         + " by " 
                         + p.getOwner().getUsername() 
                         + " (" 
-                        + (komentarze.size() == 0 ? "<b>" + komentarze.size() + "</b>" : "" + komentarze.size())
+                        + (komentarze.size() == 0 
+                            ? "<b>" + komentarze.size() + "</b>" 
+                            : "" + komentarze.size())
                         + ")" 
                         + ", "
                         + p.getDateAdded());
@@ -178,7 +192,9 @@ public class JFlickrGroupStats {
                                 s.dodajKomentarz();
                                 aktywnosc.put(komentarz.getAuthor(), s);
                             } else {
-                                aktywnosc.put(komentarz.getAuthor(), new Stats(1, 0, komentarz.getAuthorName()));
+                                aktywnosc.put(
+                                    komentarz.getAuthor(), 
+                                    new Stats(1, 0, komentarz.getAuthorName()));
                             }
                         }
 
@@ -188,6 +204,10 @@ public class JFlickrGroupStats {
 
             } // zdjęcia
 
+            /*
+             * Przeszukanie wartości ocen wszystkich użytkowników, wyszukanie
+             * najlepszej i najgorszej oceny do wydruku paska ocen
+             */
             int maksymalnaWartosc = Integer.MIN_VALUE;
             int minimalnaWartosc = Integer.MAX_VALUE;
             {
@@ -206,12 +226,21 @@ public class JFlickrGroupStats {
                 }
             }
 
-            Object[] st = aktywnosc.values().toArray();
-            Arrays.sort(st);
+            /*
+             * Wydruk pasków ocen
+             */
+            {
+                Object[] st = aktywnosc.values().toArray();
+                Arrays.sort(st);
 
-            for (Object o : st) {
-                printBar((Stats) o, minimalnaWartosc, maksymalnaWartosc);
+                for (Object o : st) {                    
+                    printBar(
+                        (Stats) o, 
+                        minimalnaWartosc, 
+                        maksymalnaWartosc);                    
+                }
             }
+            
         } catch (Exception ex) {
             ex.printStackTrace();
         }
