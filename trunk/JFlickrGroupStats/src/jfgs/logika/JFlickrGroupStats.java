@@ -304,7 +304,7 @@ public class JFlickrGroupStats {
             return;
         }
         
-        final int dlugoscUyztkownika = 15;
+        final int dlugoscUyztkownika = 20;
         final int dlugoscBelki = 30;
         String linia = "";
         
