@@ -29,6 +29,12 @@ import jfgs.gui.KontrolerGUI;
  */
 public class JFlickrGroupStats {
     
+    /*
+     * Wyłączam graficzny pasek podsumowania bo niemożliwe jest uzycie znaczników
+     * <pre> w komentarzach na Flick, wszystko się rozjeżdża
+     */
+    private static final boolean graficznyPasekPodsumowania = false;
+    
     private KontrolerGUI kgui;
     
     private NumberFormat nf;    
@@ -329,7 +335,7 @@ public class JFlickrGroupStats {
          */
         String uzytkownik = "";
         if (czyNaglowek) {
-            uzytkownik = "Użytkownik";
+            uzytkownik = "~";
         } else {
             uzytkownik = s.dajNazwe().trim();
         }
@@ -357,12 +363,14 @@ public class JFlickrGroupStats {
             p = 0;
         }
         
-        for (int i=0; i<dlugoscBelki; i++) {
-            if (i<p) {
-                linia = linia + "#";
-            } else {
-                linia = linia + ".";
-            }                    
+        if (graficznyPasekPodsumowania) {
+            for (int i=0; i<dlugoscBelki; i++) {
+                if (i<p) {
+                    linia = linia + "#";
+                } else {
+                    linia = linia + ".";
+                }                    
+            }
         }
         
         if (!czyNaglowek) {
