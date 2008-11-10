@@ -7,6 +7,8 @@ package jfgs.gui;
 
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.FlickrException;
+import com.aetrion.flickr.groups.Group;
+import com.aetrion.flickr.groups.GroupsInterface;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -45,6 +47,25 @@ public class KontrolerGUI {
     
     public Flickr getFlickr() throws ParserConfigurationException {
         return autoryzer.getFlickr();
+    }
+    
+    /**
+     * Nazwa grupy wybrana w menu
+     * @return
+     */
+    public String getNazwaGrupy() {
+        if ("".equals(getGroupId())) {
+            return "";
+        } else {
+            try {
+                GroupsInterface gi = getFlickr().getGroupsInterface();
+                Group g = gi.getInfo(getGroupId());
+                return g.getName();
+            } catch(Exception e) {
+                e.printStackTrace();
+                return "";
+            }            
+        }
     }
     
     public void autoryzuj() 

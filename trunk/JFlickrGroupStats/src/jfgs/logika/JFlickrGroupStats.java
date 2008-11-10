@@ -96,12 +96,7 @@ public class JFlickrGroupStats {
         
         try {
 
-            GroupsInterface gi = kgui.getFlickr().getGroupsInterface();
-            Group g = gi.getInfo(groupId);
-
-            drukuj("Grupa: " + g.getName());
-            
-            g.getMembers();
+            drukuj("Grupa: " + kgui.getNazwaGrupy());
 
             PoolsInterface pi = kgui.getFlickr().getPoolsInterface();
             PhotoList listaZdjec = pi.getPhotos(groupId, new String[]{}, 500, 1);
