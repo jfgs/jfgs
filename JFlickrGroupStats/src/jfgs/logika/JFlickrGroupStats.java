@@ -135,24 +135,14 @@ public class JFlickrGroupStats {
                                 * 100));
                 }
 
+                /*
+                 * Następne zdjęcie w puli zdjęć
+                 */
                 Photo p = (Photo) i.next();
-
-                String nazwaZdjecia = p.getTitle().trim();
-                if (nazwaZdjecia.length() == 0) {
-                    nazwaZdjecia = "(...)";
-                }                
-
-                if (aktywnosc.containsKey(p.getOwner().getId())) {
-                    Stats s = aktywnosc.get(p.getOwner().getId());
-                    s.dodajZdjecie();
-                    aktywnosc.put(p.getOwner().getId(), s);
-                } else {
-                    aktywnosc.put(p.getOwner().getId(), new Stats(0, 1, p.getOwner().getUsername()));
-                }
-
-                Collection komentarze = ci.getList(p.getId());
-                Iterator ic = komentarze.iterator();
                 
+                /*
+                 * Warunek na kryteria wyboru zdjęć
+                 */ 
                 if (!p.getDateAdded().after(kgui.dajDataOd()) 
                         || !p.getDateAdded().before(kgui.dajDataDo()))
                 {
@@ -162,6 +152,28 @@ public class JFlickrGroupStats {
                 } else {
                     
                     numerPrzetwarzanegoZdjecia++;
+                    
+                    String nazwaZdjecia = p.getTitle().trim();
+                    if (nazwaZdjecia.length() == 0) {
+                        nazwaZdjecia = "(...)";
+                    }                
+
+                    /*
+                     * Zliczanie zdjęć autora
+                     */
+                    if (aktywnosc.containsKey(p.getOwner().getId())) {
+                        Stats s = aktywnosc.get(p.getOwner().getId());
+                        s.dodajZdjecie();
+                        aktywnosc.put(
+                            p.getOwner().getId(), s);
+                    } else {
+                        aktywnosc.put(
+                            p.getOwner().getId(), 
+                            new Stats(0, 1, p.getOwner().getUsername()));
+                    }
+
+                    Collection komentarze = ci.getList(p.getId());
+                    Iterator ic = komentarze.iterator();                    
                 
                     drukuj(
                         nf.format(numerPrzetwarzanegoZdjecia) 
@@ -181,6 +193,9 @@ public class JFlickrGroupStats {
                         + ", "
                         + p.getDateAdded());
 
+                    /*
+                     * Zliczanie komentarzy autora
+                     */
                     while (ic.hasNext()) {
 
                         Comment komentarz = (Comment) ic.next();
@@ -202,9 +217,29 @@ public class JFlickrGroupStats {
                     } // komentarze
                 
                 } // w zakresie dat
+                
+                /*
+                 * Optymalizacja, zdjęć za datą końcową nie analizujemy
+                 */
+                if (p.getDateAdded().before(kgui.dajDataOd())) {
+                    break;
+                }
 
-            } // zdjęcia
+            } // wszystkie zdjęcia w puli
 
+            
+            
+            /*
+             * Poniżej akcje wykonane po przeanalizowaniu całej puli zdjęć
+             */
+            
+            
+            
+            /*
+             * Pasek ustawiony do końca
+             */
+            kgui.ustawPostep(100);           
+                        
             /*
              * Przeszukanie wartości ocen wszystkich użytkowników, wyszukanie
              * najlepszej i najgorszej oceny do wydruku paska ocen
