@@ -25,7 +25,8 @@ import com.aetrion.flickr.util.FileAuthStore;
 import java.io.File;
 
 /**
- *
+ * Klasa potrzebna do autoryzowania się w Flickr API.
+ * 
  * @author michalus
  */
 public class Autoryzer {
@@ -42,16 +43,40 @@ public class Autoryzer {
         flickr = new Flickr(Constants.apiKey, Constants.sharedSecret, new REST());
     }
     
+    /**
+     * Podstawowy obiekt API
+     * 
+     * @return
+     * @throws javax.xml.parsers.ParserConfigurationException
+     */
     public Flickr getFlickr() throws ParserConfigurationException {        
         return flickr;
     }
     
+    /**
+     * Autoryzuj - nowa autoryzacja lub autoryzacja zapisana na dysku
+     * 
+     * @param kgui
+     * @throws java.io.IOException
+     * @throws org.xml.sax.SAXException
+     * @throws com.aetrion.flickr.FlickrException
+     * @throws java.net.URISyntaxException
+     */
     public void autoryzuj(KontrolerGUI kgui) 
         throws IOException, SAXException, FlickrException, URISyntaxException 
     {
         przywrocAutoryzacje(kgui);
     }
     
+    /**
+     * Odczytanie autoryzacji zapisanej na dysku 
+     * 
+     * @param kgui
+     * @throws java.io.IOException
+     * @throws org.xml.sax.SAXException
+     * @throws com.aetrion.flickr.FlickrException
+     * @throws java.net.URISyntaxException
+     */
     private void przywrocAutoryzacje(KontrolerGUI kgui) 
         throws IOException, SAXException, FlickrException, URISyntaxException 
     {
@@ -76,6 +101,15 @@ public class Autoryzer {
         kgui.ustawAuth("Zalogowany jako "+auth.getUser().getUsername());
     }
     
+    /**
+     * Nowa autoryzacja
+     * 
+     * @param kgui
+     * @throws java.io.IOException
+     * @throws org.xml.sax.SAXException
+     * @throws com.aetrion.flickr.FlickrException
+     * @throws java.net.URISyntaxException
+     */
     private void nowaAutoryzacja(KontrolerGUI kgui) 
         throws IOException, SAXException, FlickrException, URISyntaxException 
     {        
@@ -102,6 +136,11 @@ public class Autoryzer {
             "Autoryzacja przebiegła pomyślnie i zostanie zapisana.");
 	}
     
+    /**
+     * Czy poprawnie autoryzowany
+     * 
+     * @return
+     */
     public boolean czyAutoryzowany() {
         return autoryzowany;
     }
