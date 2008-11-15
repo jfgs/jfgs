@@ -160,8 +160,6 @@ public class JFlickrGroupStats {
             
             liczbaWszystkichZdjecPuli = listaZdjec.getTotal();
 
-            CommentsInterface ci = kgui.getFlickr().getCommentsInterface();
-
             /*
              * Kolekcja obiektów reprezentujących aktywność użytkownika, kluczem
              * jest identyfikator użytkownika
@@ -244,6 +242,7 @@ public class JFlickrGroupStats {
                             new Stats(0, 1, p.getOwner().getUsername()));
                     }
 
+                    CommentsInterface ci = kgui.getFlickr().getCommentsInterface();
                     Collection komentarze = ci.getList(p.getId());
                     Iterator ic = komentarze.iterator();                    
                 
