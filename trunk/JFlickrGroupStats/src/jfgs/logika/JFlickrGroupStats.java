@@ -17,6 +17,7 @@ import com.aetrion.flickr.photos.comments.Comment;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import jfgs.gui.KontrolerGUI;
 
@@ -27,11 +28,30 @@ import jfgs.gui.KontrolerGUI;
  */
 public class JFlickrGroupStats {
     
-    /*
+    /**
      * Wyłączam graficzny pasek podsumowania bo niemożliwe jest uzycie znaczników
      * <pre> w komentarzach na Flick, wszystko się rozjeżdża
      */
     private static final boolean graficznyPasekPodsumowania = false;
+    
+    /**
+     * Czy po liście zdjęć dodać podsumowanie zbiorcze: użytkownik, liczba
+     * komentarzy i bilans komentarze do zdjęć     
+     */
+    private static final boolean dodajPodsumowanieZbiorcze = true;
+    
+    /**
+     * Czy generujemy kostkę z miniaturkami zdjęć
+     */
+    private static final boolean dodajKostkeMiniaturek = true;
+    
+    /**
+     * Liczba miniatur w wierszu, trzeba zmieścić się w szerokości pola
+     * do komentarzy
+     */
+    private static final int liczbaZdjecWierszaKostkiMiniaturek = 5;
+    
+    
     
     private KontrolerGUI kgui;
     
@@ -44,11 +64,20 @@ public class JFlickrGroupStats {
      */
     private void drukuj(String s) {
         try {
-            System.out.println(s);
-            doPliku(s+"\n");
+            System.out.print(s);
+            doPliku(s);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+    
+    /**
+     * Jednoczesne drukowanie na ekran oraz do pliku pełnej linii, kończymy
+     * wszystko enterem
+     * @param s
+     */
+    private void drukujLinie(String s) {
+        drukuj(s+"\n");
     }
     
     /**
@@ -94,7 +123,7 @@ public class JFlickrGroupStats {
         
         try {
 
-            drukuj("Grupa: " + kgui.getNazwaGrupy());
+            drukujLinie("Grupa: " + kgui.getNazwaGrupy());
 
             PoolsInterface pi = kgui.getFlickr().getPoolsInterface();
             PhotoList listaZdjec = pi.getPhotos(groupId, new String[]{}, 500, 1);
@@ -103,7 +132,16 @@ public class JFlickrGroupStats {
 
             CommentsInterface ci = kgui.getFlickr().getCommentsInterface();
 
+            /*
+             * Kolekcja obiektów reprezentujących aktywność użytkownika, kluczem
+             * jest identyfikator użytkownika
+             */
             HashMap<String, Stats> aktywnosc = new HashMap<String, Stats>();
+            
+            /*
+             * Kolekcja zdjęć w zakresie kryteriów
+             */
+            ArrayList<Photo> zdjecia = new ArrayList<Photo>();
 
             Iterator i = listaZdjec.iterator();
             
@@ -152,6 +190,11 @@ public class JFlickrGroupStats {
                     
                     numerPrzetwarzanegoZdjecia++;
                     
+                    /*
+                     * Zapamiętujemy przetwarzane zdjęcia
+                     */
+                    zdjecia.add(p);
+                    
                     String nazwaZdjecia = p.getTitle().trim();
                     if (nazwaZdjecia.length() == 0) {
                         nazwaZdjecia = "(...)";
@@ -174,7 +217,7 @@ public class JFlickrGroupStats {
                     Collection komentarze = ci.getList(p.getId());
                     Iterator ic = komentarze.iterator();                    
                 
-                    drukuj(
+                    drukujLinie(
                         nf.format(numerPrzetwarzanegoZdjecia) 
                         + ": " 
                         + "<a href=\"" 
@@ -238,33 +281,34 @@ public class JFlickrGroupStats {
              * Pasek ustawiony do końca
              */
             kgui.ustawPostep(100);           
-                        
+            
             /*
-             * Przeszukanie wartości ocen wszystkich użytkowników, wyszukanie
-             * najlepszej i najgorszej oceny do wydruku paska ocen
+             * Wydruk wydruku "pasków" ocen
              */
-            int maksymalnaWartosc = Integer.MIN_VALUE;
-            int minimalnaWartosc = Integer.MAX_VALUE;
-            {
-                Iterator is = aktywnosc.keySet().iterator();
-                while (is.hasNext()) {
+            if (dodajPodsumowanieZbiorcze) {
+            
+                /*
+                 * Przeszukanie wartości ocen wszystkich użytkowników, wyszukanie
+                 * najlepszej i najgorszej oceny do wydruku paska ocen
+                 */
+                int maksymalnaWartosc = Integer.MIN_VALUE;
+                int minimalnaWartosc = Integer.MAX_VALUE;
+                {
+                    Iterator is = aktywnosc.keySet().iterator();
+                    while (is.hasNext()) {
 
-                    String key = (String) is.next();
-                    Stats s = aktywnosc.get(key);
+                        String key = (String) is.next();
+                        Stats s = aktywnosc.get(key);
 
-                    if (s.dajWartosc() < minimalnaWartosc) {
-                        minimalnaWartosc = s.dajWartosc();
-                    }
-                    if (s.dajWartosc() > maksymalnaWartosc) {
-                        maksymalnaWartosc = s.dajWartosc();
+                        if (s.dajWartosc() < minimalnaWartosc) {
+                            minimalnaWartosc = s.dajWartosc();
+                        }
+                        if (s.dajWartosc() > maksymalnaWartosc) {
+                            maksymalnaWartosc = s.dajWartosc();
+                        }
                     }
                 }
-            }
-
-            /*
-             * Wydruk pasków ocen
-             */
-            {
+            
                 Object[] st = aktywnosc.values().toArray();
                 Arrays.sort(st);
 
@@ -276,6 +320,47 @@ public class JFlickrGroupStats {
                         minimalnaWartosc, 
                         maksymalnaWartosc);                    
                 }
+                
+            }
+            
+            /*
+             * Warunek wydruku kostki miniaturek
+             */
+            if (dodajKostkeMiniaturek) {
+                
+                Iterator<Photo> ip = zdjecia.iterator();
+                int zdjecieWKostce = 1;
+                
+                while(ip.hasNext()) {
+                    
+                    Photo zdjecie = ip.next();
+                    
+                    drukuj(
+                        "<a href=\"" 
+                        + zdjecie.getUrl() 
+                        + "\" " 
+                        + "title=\"" 
+                        + zdjecie.getTitle() 
+                        + " by " 
+                        + zdjecie.getOwner().getUsername() 
+                        + ", on Flickr\">"
+                        + "<img src=\"" 
+                        + zdjecie.getSmallSquareUrl() 
+                        + "\" "
+                        + "width=\"75\" "
+                        + "height=\"75\" "
+                        + "alt=\"" 
+                        + zdjecie.getTitle() 
+                        + "\" /></a>");
+                    
+                    if (zdjecieWKostce % liczbaZdjecWierszaKostkiMiniaturek == 0) {
+                        drukujLinie("");
+                    }
+                    
+                    zdjecieWKostce++;
+                    
+                }
+                
             }
             
         } catch (Exception ex) {
@@ -385,7 +470,7 @@ public class JFlickrGroupStats {
                 +"]";
         }
         
-        drukuj(linia);
+        drukujLinie(linia);
         
     }    
         
