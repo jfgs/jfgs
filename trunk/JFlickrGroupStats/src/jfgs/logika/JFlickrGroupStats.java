@@ -16,9 +16,12 @@ import java.util.HashMap;
 import com.aetrion.flickr.photos.comments.Comment;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Locale;
 import jfgs.gui.KontrolerGUI;
 
 /**
@@ -55,7 +58,9 @@ public class JFlickrGroupStats {
     
     private KontrolerGUI kgui;
     
-    private NumberFormat nf;    
+    private NumberFormat nf;
+    private DateFormat df;
+    
     private BufferedWriter out;
     
     /**
@@ -108,6 +113,13 @@ public class JFlickrGroupStats {
         }
     }
     
+    /**
+     * Separator graficzny
+     */
+    private void drukujSeparator() {
+        drukujLinie("\n(<b>***</b>)\n");
+    }
+    
     public JFlickrGroupStats(String groupId, KontrolerGUI kgui) {
         
         this.kgui = kgui;
@@ -116,6 +128,9 @@ public class JFlickrGroupStats {
         nf.setMaximumFractionDigits(0);
         nf.setMinimumIntegerDigits(3);
         
+        df = DateFormat.getDateInstance();
+        df.setCalendar(Calendar.getInstance(Locale.getDefault()));
+        
         /*
          * Wszystkie zdjęcia w puli
          */ 
@@ -123,7 +138,22 @@ public class JFlickrGroupStats {
         
         try {
 
-            drukujLinie("Grupa: " + kgui.getNazwaGrupy());
+            drukujSeparator();
+            
+            drukujLinie(
+                "Grupa: " 
+                + kgui.getNazwaGrupy());
+            
+            drukujLinie(
+                "Zdjęcia dodane po "
+                + df.format(kgui.dajDataOd()) 
+                + " i przed " 
+                + df.format(kgui.dajDataDo())
+                + ".");
+            
+            drukujSeparator();
+            
+            
 
             PoolsInterface pi = kgui.getFlickr().getPoolsInterface();
             PhotoList listaZdjec = pi.getPhotos(groupId, new String[]{}, 500, 1);
@@ -233,7 +263,7 @@ public class JFlickrGroupStats {
                             : "" + komentarze.size())
                         + ")" 
                         + ", "
-                        + p.getDateAdded());
+                        + df.format(p.getDateAdded()));
 
                     /*
                      * Zliczanie komentarzy autora
@@ -280,7 +310,9 @@ public class JFlickrGroupStats {
             /*
              * Pasek ustawiony do końca
              */
-            kgui.ustawPostep(100);           
+            kgui.ustawPostep(100);
+            
+            drukujSeparator();
             
             /*
              * Wydruk wydruku "pasków" ocen
@@ -321,6 +353,8 @@ public class JFlickrGroupStats {
                         maksymalnaWartosc);                    
                 }
                 
+                drukujSeparator();
+                
             }
             
             /*
@@ -353,13 +387,21 @@ public class JFlickrGroupStats {
                         + zdjecie.getTitle() 
                         + "\" /></a>");
                     
-                    if (zdjecieWKostce % liczbaZdjecWierszaKostkiMiniaturek == 0) {
+                    /*
+                     * Na koniec wiersza i po ostatnim zdjęciu chcemy mieć
+                     * znak nowej linii
+                     */
+                    if (zdjecieWKostce % liczbaZdjecWierszaKostkiMiniaturek == 0
+                        || !ip.hasNext()) 
+                    {
                         drukujLinie("");
                     }
                     
                     zdjecieWKostce++;
                     
                 }
+                
+                drukujSeparator();
                 
             }
             
