@@ -5,8 +5,6 @@
 
 package jfgs.logika;
 
-import com.aetrion.flickr.groups.Group;
-import com.aetrion.flickr.groups.GroupsInterface;
 import com.aetrion.flickr.groups.pools.PoolsInterface;
 import com.aetrion.flickr.photos.PhotoList;
 import java.io.IOException;
