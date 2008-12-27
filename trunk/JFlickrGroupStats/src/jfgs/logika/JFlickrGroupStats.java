@@ -14,14 +14,8 @@ import com.aetrion.flickr.photos.comments.CommentsInterface;
 import java.util.Collection;
 import java.util.HashMap;
 import com.aetrion.flickr.photos.comments.Comment;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Locale;
 import jfgs.gui.KontrolerGUI;
 
 /**
@@ -54,82 +48,15 @@ public class JFlickrGroupStats {
      */
     private static final int liczbaZdjecWierszaKostkiMiniaturek = 5;
     
-    
-    
     private KontrolerGUI kgui;
+    private DaneWyjsciowe dw;
     
-    private NumberFormat nf;
-    private DateFormat df;
     
-    private BufferedWriter out;
-    
-    /**
-     * Jednoczesne drukowanie na ekran oraz do pliku
-     * @param s
-     */
-    private void drukuj(String s) {
-        try {
-            System.out.print(s);
-            doPliku(s);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-    
-    /**
-     * Jednoczesne drukowanie na ekran oraz do pliku pełnej linii, kończymy
-     * wszystko enterem
-     * @param s
-     */
-    private void drukujLinie(String s) {
-        drukuj(s+"\n");
-    }
-    
-    /**
-     * Drukowanie do pliku. Jeżeli plik nie jest otwraty otwiera go.
-     * 
-     * @param s
-     * @throws java.io.IOException
-     * @see drukuj
-     */
-    private void doPliku(String s) throws IOException {
-        if (out == null) {
-            out = new BufferedWriter(new FileWriter(Constants.output));
-        }
-        out.write(s);
-        out.flush();
-    }
-    
-    /**
-     * Zamykanie pliku z logiem
-     * 
-     * @throws java.io.IOException
-     * @see drukuj
-     */
-    private void zamknijPlik() throws IOException {
-        if (out != null) {
-            out.flush();
-            out.close();
-        }
-    }
-    
-    /**
-     * Separator graficzny
-     */
-    private void drukujSeparator() {
-        drukujLinie("\n(<b>***</b>)\n");
-    }
     
     public JFlickrGroupStats(String groupId, KontrolerGUI kgui) {
         
         this.kgui = kgui;
-        
-        nf = NumberFormat.getInstance();
-        nf.setMaximumFractionDigits(0);
-        nf.setMinimumIntegerDigits(3);
-        
-        df = DateFormat.getDateInstance();
-        df.setCalendar(Calendar.getInstance(Locale.getDefault()));
+        dw = new DaneWyjsciowe();        
         
         /*
          * Wszystkie zdjęcia w puli
@@ -138,20 +65,20 @@ public class JFlickrGroupStats {
         
         try {
 
-            drukujSeparator();
+            dw.drukujSeparator();
             
-            drukujLinie(
+            dw.drukujLinie(
                 "Grupa: " 
                 + kgui.getNazwaGrupy());
             
-            drukujLinie(
+            dw.drukujLinie(
                 "Zdjęcia dodane po "
-                + df.format(kgui.dajDataOd()) 
+                + dw.formatujDate(kgui.dajDataOd()) 
                 + " i przed " 
-                + df.format(kgui.dajDataDo())
+                + dw.formatujDate(kgui.dajDataDo())
                 + ".");
             
-            drukujSeparator();
+            dw.drukujSeparator();
             
             
 
@@ -246,8 +173,8 @@ public class JFlickrGroupStats {
                     Collection komentarze = ci.getList(p.getId());
                     Iterator ic = komentarze.iterator();                    
                 
-                    drukujLinie(
-                        nf.format(numerPrzetwarzanegoZdjecia) 
+                    dw.drukujLinie(
+                        dw.formatujLiczbe(numerPrzetwarzanegoZdjecia) 
                         + ": " 
                         + "<a href=\"" 
                         + p.getUrl() 
@@ -262,7 +189,7 @@ public class JFlickrGroupStats {
                             : "" + komentarze.size())
                         + ")" 
                         + ", "
-                        + df.format(p.getDateAdded()));
+                        + dw.formatujDate(p.getDateAdded()));
 
                     /*
                      * Zliczanie komentarzy autora
@@ -311,7 +238,7 @@ public class JFlickrGroupStats {
              */
             kgui.ustawPostep(100);
             
-            drukujSeparator();
+            dw.drukujSeparator();
             
             /*
              * Wydruk wydruku "pasków" ocen
@@ -352,7 +279,7 @@ public class JFlickrGroupStats {
                         maksymalnaWartosc);                    
                 }
                 
-                drukujSeparator();
+                dw.drukujSeparator();
                 
             }
             
@@ -368,7 +295,7 @@ public class JFlickrGroupStats {
                     
                     Photo zdjecie = ip.next();
                     
-                    drukuj(
+                    dw.drukuj(
                         "<a href=\"" 
                         + zdjecie.getUrl() 
                         + "\" " 
@@ -393,14 +320,14 @@ public class JFlickrGroupStats {
                     if (zdjecieWKostce % liczbaZdjecWierszaKostkiMiniaturek == 0
                         || !ip.hasNext()) 
                     {
-                        drukujLinie("");
+                        dw.drukujLinie("");
                     }
                     
                     zdjecieWKostce++;
                     
                 }
                 
-                drukujSeparator();
+                dw.drukujSeparator();
                 
             }
             
@@ -409,7 +336,7 @@ public class JFlickrGroupStats {
         }
 
         try {
-            zamknijPlik();
+            dw.zamknijPlik();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -511,7 +438,7 @@ public class JFlickrGroupStats {
                 +"]";
         }
         
-        drukujLinie(linia);
+        dw.drukujLinie(linia);
         
     }    
         
