@@ -125,9 +125,12 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
             rokDo.setText(""+c.get(Calendar.YEAR));
             miesiacDo.setSelectedIndex(c.get(Calendar.MONTH));
             
-            if (c.get(Calendar.MONTH) == Calendar.DECEMBER) {
+            /*
+             * Jeżeli jesteśmy w styczniu to analizujemy poprzedni rok
+             */
+            if (c.get(Calendar.MONTH) == Calendar.JANUARY) {
                 rokOd.setText(""+(c.get(Calendar.YEAR)-1));
-                miesiacOd.setSelectedIndex(Calendar.JANUARY);
+                miesiacOd.setSelectedIndex(Calendar.DECEMBER);
             } else {
                 rokOd.setText(""+c.get(Calendar.YEAR));
                 miesiacOd.setSelectedIndex(c.get(Calendar.MONTH)-1);
