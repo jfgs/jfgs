@@ -4,7 +4,7 @@
  * Created on 6 październik 2008, 17:48
  */
 
-package jfgs.gui;
+package jfgs.zm.gui;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -14,7 +14,7 @@ import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
-import jfgs.logika.JFlickrGroupStats;
+import jfgs.zm.logika.JFlickrGroupStats;
 
 /**
  *

@@ -5,7 +5,6 @@
 
 package jfgs.narzedzia;
 
-import jfgs.logika.*;
 import com.aetrion.flickr.FlickrException;
 import com.aetrion.flickr.RequestContext;
 import com.aetrion.flickr.auth.Auth;
@@ -18,7 +17,7 @@ import org.xml.sax.SAXException;
 import java.awt.Desktop;
 import java.net.URI;
 import javax.swing.JOptionPane;
-import jfgs.gui.KontrolerGUI;
+import jfgs.zm.gui.KontrolerGUI;
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.REST;
 import com.aetrion.flickr.util.AuthStore;

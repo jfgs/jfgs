@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package jfgs.logika;
+package jfgs.zm.logika;
 
 /**
  * Strukturka poboczna do przechowywania informacji o statystyce użytkownika

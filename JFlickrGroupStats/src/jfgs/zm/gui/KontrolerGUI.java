@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package jfgs.gui;
+package jfgs.zm.gui;
 
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.FlickrException;

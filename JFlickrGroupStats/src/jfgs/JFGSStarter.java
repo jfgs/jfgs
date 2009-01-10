@@ -5,7 +5,7 @@
 
 package jfgs;
 
-import jfgs.gui.StatsFrame;
+import jfgs.zm.gui.StatsFrame;
 
 /**
  * Załadowanie JFlickrGroupStats
