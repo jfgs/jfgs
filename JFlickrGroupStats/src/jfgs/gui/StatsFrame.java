@@ -15,7 +15,6 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import jfgs.narzedzia.PogromcaLogiki;
-import jfgs.zm.ZdjecieMiesiaca;
 
 /**
  *
