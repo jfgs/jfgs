@@ -3,8 +3,9 @@
  * and open the template in the editor.
  */
 
-package jfgs.logika;
+package jfgs.narzedzia;
 
+import jfgs.logika.*;
 import com.aetrion.flickr.FlickrException;
 import com.aetrion.flickr.RequestContext;
 import com.aetrion.flickr.auth.Auth;

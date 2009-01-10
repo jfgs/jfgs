@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package jfgs.logika;
+package jfgs.narzedzia;
 
 /**
  * Wszystkie stałe używane dalej w kodzie
