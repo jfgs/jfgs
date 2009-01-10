@@ -18,7 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.xml.parsers.ParserConfigurationException;
-import jfgs.logika.Autoryzer;
+import jfgs.narzedzia.Autoryzer;
 import org.xml.sax.SAXException;
 
 /**

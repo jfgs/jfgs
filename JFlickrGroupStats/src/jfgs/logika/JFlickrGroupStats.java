@@ -5,6 +5,7 @@
 
 package jfgs.logika;
 
+import jfgs.narzedzia.DaneWyjsciowe;
 import com.aetrion.flickr.groups.pools.PoolsInterface;
 import com.aetrion.flickr.photos.PhotoList;
 import java.io.IOException;
@@ -91,7 +92,7 @@ public class JFlickrGroupStats {
              * Kolekcja obiektów reprezentujących aktywność użytkownika, kluczem
              * jest identyfikator użytkownika
              */
-            HashMap<String, Stats> aktywnosc = new HashMap<String, Stats>();
+            HashMap<String, StatystykaAutora> aktywnosc = new HashMap<String, StatystykaAutora>();
             
             /*
              * Kolekcja zdjęć w zakresie kryteriów
@@ -159,14 +160,14 @@ public class JFlickrGroupStats {
                      * Zliczanie zdjęć autora
                      */
                     if (aktywnosc.containsKey(p.getOwner().getId())) {
-                        Stats s = aktywnosc.get(p.getOwner().getId());
+                        StatystykaAutora s = aktywnosc.get(p.getOwner().getId());
                         s.dodajZdjecie();
                         aktywnosc.put(
                             p.getOwner().getId(), s);
                     } else {
                         aktywnosc.put(
                             p.getOwner().getId(), 
-                            new Stats(0, 1, p.getOwner().getUsername()));
+                            new StatystykaAutora(0, 1, p.getOwner().getUsername()));
                     }
 
                     CommentsInterface ci = kgui.getFlickr().getCommentsInterface();
@@ -202,13 +203,13 @@ public class JFlickrGroupStats {
                             // Swoich komentarzy nie liczymy
                         } else {
                             if (aktywnosc.containsKey(komentarz.getAuthor())) {
-                                Stats s = aktywnosc.get(komentarz.getAuthor());
+                                StatystykaAutora s = aktywnosc.get(komentarz.getAuthor());
                                 s.dodajKomentarz();
                                 aktywnosc.put(komentarz.getAuthor(), s);
                             } else {
                                 aktywnosc.put(
                                     komentarz.getAuthor(), 
-                                    new Stats(1, 0, komentarz.getAuthorName()));
+                                    new StatystykaAutora(1, 0, komentarz.getAuthorName()));
                             }
                         }
 
@@ -256,7 +257,7 @@ public class JFlickrGroupStats {
                     while (is.hasNext()) {
 
                         String key = (String) is.next();
-                        Stats s = aktywnosc.get(key);
+                        StatystykaAutora s = aktywnosc.get(key);
 
                         if (s.dajWartosc() < minimalnaWartosc) {
                             minimalnaWartosc = s.dajWartosc();
@@ -274,7 +275,7 @@ public class JFlickrGroupStats {
                 
                 for (Object o : st) {                    
                     drukujPasekOcen(
-                        (Stats) o, 
+                        (StatystykaAutora) o,
                         minimalnaWartosc, 
                         maksymalnaWartosc);                    
                 }
@@ -356,14 +357,14 @@ public class JFlickrGroupStats {
      * @param minimalna wartość dla funkcji oceny
      * @param maksymalna wartość dla funkcji oceny
      */
-    private void drukujPasekOcen(Stats s, int minimalna, int maksymalna) {
+    private void drukujPasekOcen(StatystykaAutora s, int minimalna, int maksymalna) {
         pasekOcen(s, minimalna, maksymalna, false);
     }    
     
     /*
      * Narzędziowa funkcja drukująca pasek lub nagłówek
      */
-    private void pasekOcen(Stats s, int minimalna, int maksymalna, boolean czyNaglowek) {
+    private void pasekOcen(StatystykaAutora s, int minimalna, int maksymalna, boolean czyNaglowek) {
         
         /*
          * Użytkowników nie dodających zdjęć nie drukujemy

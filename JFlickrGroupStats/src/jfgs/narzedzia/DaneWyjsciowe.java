@@ -3,8 +3,9 @@
  * and open the template in the editor.
  */
 
-package jfgs.logika;
+package jfgs.narzedzia;
 
+import jfgs.narzedzia.Constants;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
