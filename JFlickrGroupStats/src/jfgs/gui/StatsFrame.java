@@ -14,6 +14,7 @@ import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
+import jfgs.narzedzia.PogromcaLogiki;
 import jfgs.zm.ZdjecieMiesiaca;
 
 /**
@@ -62,20 +63,9 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
     /**
      * Akcja głównego guzika
      */
-    private void akcjaGeneruj() {        
+    private void akcjaGeneruj() {
         stanKomponentów(false);
-        
-        {
-            Thread t = new Thread() {
-
-                @Override
-                public void run() {
-                    new ZdjecieMiesiaca(kgui.getGroupId(), kgui);
-                }
-                
-            };
-            t.start();
-        }        
+        PogromcaLogiki.wykonaj(PogromcaLogiki.LOGIKA_ZDJECIA_MIESIACA, kgui);
     }
     
     /**

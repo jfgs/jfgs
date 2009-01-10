@@ -18,6 +18,7 @@ import com.aetrion.flickr.photos.comments.Comment;
 import java.util.ArrayList;
 import java.util.Arrays;
 import jfgs.gui.KontrolerGUI;
+import jfgs.narzedzia.ILogika;
 
 /**
  * "Zdjęcie miesiąca" to logika pozwalająca podsumować dowolnie wybrany okres
@@ -26,7 +27,7 @@ import jfgs.gui.KontrolerGUI;
  * 
  * @author michalus
  */
-public class ZdjecieMiesiaca {
+public class ZdjecieMiesiaca implements ILogika {
     
     /**
      * Wyłączam graficzny pasek podsumowania bo niemożliwe jest uzycie znaczników
@@ -54,40 +55,45 @@ public class ZdjecieMiesiaca {
     private KontrolerGUI kgui;
     private DaneWyjsciowe dw;
     
-    
-    
-    public ZdjecieMiesiaca(String groupId, KontrolerGUI kgui) {
-        
-        this.kgui = kgui;
-        dw = new DaneWyjsciowe();        
-        
+
+
+    public ZdjecieMiesiaca() { }
+
+    public int wykonajZadanie() {
+
+        if (kgui == null) {
+            throw new RuntimeException("Brak kontrolera GUI!");
+        }
+
+        dw = new DaneWyjsciowe();
+
         /*
          * Wszystkie zdjęcia w puli
-         */ 
+         */
         int liczbaWszystkichZdjecPuli = 0;
-        
+
         try {
 
             dw.drukujSeparator();
-            
+
             dw.drukujLinie(
-                "Grupa: " 
+                "Grupa: "
                 + kgui.getNazwaGrupy());
-            
+
             dw.drukujLinie(
                 "Zdjęcia dodane po "
-                + dw.formatujDate(kgui.dajDataOd()) 
-                + " i przed " 
+                + dw.formatujDate(kgui.dajDataOd())
+                + " i przed "
                 + dw.formatujDate(kgui.dajDataDo())
                 + ".");
-            
+
             dw.drukujSeparator();
-            
-            
+
+
 
             PoolsInterface pi = kgui.getFlickr().getPoolsInterface();
-            PhotoList listaZdjec = pi.getPhotos(groupId, new String[]{}, 500, 1);
-            
+            PhotoList listaZdjec = pi.getPhotos(kgui.getGroupId(), new String[]{}, 500, 1);
+
             liczbaWszystkichZdjecPuli = listaZdjec.getTotal();
 
             /*
@@ -95,19 +101,19 @@ public class ZdjecieMiesiaca {
              * jest identyfikator użytkownika
              */
             HashMap<String, StatystykaAutora> aktywnosc = new HashMap<String, StatystykaAutora>();
-            
+
             /*
              * Kolekcja zdjęć w zakresie kryteriów
              */
             ArrayList<Photo> zdjecia = new ArrayList<Photo>();
 
             Iterator i = listaZdjec.iterator();
-            
+
             /*
              * Numer zdjęcia w puli zdjęć
              */
             int numerZdjeciaWPuli = 0;
-            
+
             /*
              * Numer zdjęcia w zakresie kryteriów przeszukiwania
              */
@@ -115,17 +121,17 @@ public class ZdjecieMiesiaca {
 
             while (i.hasNext()) {
 
-                numerZdjeciaWPuli++;                
-                
+                numerZdjeciaWPuli++;
+
                 /*
                  * Przesuwamy pasek postępu
-                 */                
+                 */
                 if (liczbaWszystkichZdjecPuli == 0) {
                     kgui.ustawPostep(0);
-                } else {                    
+                } else {
                     kgui.ustawPostep(
                         (int) Math.round(
-                            (double) numerZdjeciaWPuli 
+                            (double) numerZdjeciaWPuli
                                 / (double) liczbaWszystkichZdjecPuli
                                 * 100));
                 }
@@ -134,29 +140,29 @@ public class ZdjecieMiesiaca {
                  * Następne zdjęcie w puli zdjęć
                  */
                 Photo p = (Photo) i.next();
-                
+
                 /*
                  * Warunek na kryteria wyboru zdjęć
-                 */ 
-                if (!p.getDateAdded().after(kgui.dajDataOd()) 
+                 */
+                if (!p.getDateAdded().after(kgui.dajDataOd())
                         || !p.getDateAdded().before(kgui.dajDataDo()))
                 {
-                    
+
                     // zdjęcie poza zakresem badanych dat
-                    
+
                 } else {
-                    
+
                     numerPrzetwarzanegoZdjecia++;
-                    
+
                     /*
                      * Zapamiętujemy przetwarzane zdjęcia
                      */
                     zdjecia.add(p);
-                    
+
                     String nazwaZdjecia = p.getTitle().trim();
                     if (nazwaZdjecia.length() == 0) {
                         nazwaZdjecia = "(...)";
-                    }                
+                    }
 
                     /*
                      * Zliczanie zdjęć autora
@@ -168,29 +174,29 @@ public class ZdjecieMiesiaca {
                             p.getOwner().getId(), s);
                     } else {
                         aktywnosc.put(
-                            p.getOwner().getId(), 
+                            p.getOwner().getId(),
                             new StatystykaAutora(0, 1, p.getOwner().getUsername()));
                     }
 
                     CommentsInterface ci = kgui.getFlickr().getCommentsInterface();
                     Collection komentarze = ci.getList(p.getId());
-                    Iterator ic = komentarze.iterator();                    
-                
+                    Iterator ic = komentarze.iterator();
+
                     dw.drukujLinie(
-                        dw.formatujLiczbe(numerPrzetwarzanegoZdjecia) 
-                        + ": " 
-                        + "<a href=\"" 
-                        + p.getUrl() 
-                        + "\">" 
-                        + nazwaZdjecia 
-                        + "</a>" 
-                        + " by " 
-                        + p.getOwner().getUsername() 
-                        + " (" 
-                        + (komentarze.size() == 0 
-                            ? "<b>" + komentarze.size() + "</b>" 
+                        dw.formatujLiczbe(numerPrzetwarzanegoZdjecia)
+                        + ": "
+                        + "<a href=\""
+                        + p.getUrl()
+                        + "\">"
+                        + nazwaZdjecia
+                        + "</a>"
+                        + " by "
+                        + p.getOwner().getUsername()
+                        + " ("
+                        + (komentarze.size() == 0
+                            ? "<b>" + komentarze.size() + "</b>"
                             : "" + komentarze.size())
-                        + ")" 
+                        + ")"
                         + ", "
                         + dw.formatujDate(p.getDateAdded()));
 
@@ -210,15 +216,15 @@ public class ZdjecieMiesiaca {
                                 aktywnosc.put(komentarz.getAuthor(), s);
                             } else {
                                 aktywnosc.put(
-                                    komentarz.getAuthor(), 
+                                    komentarz.getAuthor(),
                                     new StatystykaAutora(1, 0, komentarz.getAuthorName()));
                             }
                         }
 
                     } // komentarze
-                
+
                 } // w zakresie dat
-                
+
                 /*
                  * Optymalizacja, zdjęć za datą końcową nie analizujemy
                  */
@@ -228,26 +234,26 @@ public class ZdjecieMiesiaca {
 
             } // wszystkie zdjęcia w puli
 
-            
-            
+
+
             /*
              * Poniżej akcje wykonane po przeanalizowaniu całej puli zdjęć
              */
-            
-            
-            
+
+
+
             /*
              * Pasek ustawiony do końca
              */
             kgui.ustawPostep(100);
-            
+
             dw.drukujSeparator();
-            
+
             /*
              * Wydruk wydruku "pasków" ocen
              */
             if (dodajPodsumowanieZbiorcze) {
-            
+
                 /*
                  * Przeszukanie wartości ocen wszystkich użytkowników, wyszukanie
                  * najlepszej i najgorszej oceny do wydruku paska ocen
@@ -269,71 +275,71 @@ public class ZdjecieMiesiaca {
                         }
                     }
                 }
-            
+
                 Object[] st = aktywnosc.values().toArray();
                 Arrays.sort(st);
 
                 drukujNaglowekOcen();
-                
-                for (Object o : st) {                    
+
+                for (Object o : st) {
                     drukujPasekOcen(
                         (StatystykaAutora) o,
-                        minimalnaWartosc, 
-                        maksymalnaWartosc);                    
+                        minimalnaWartosc,
+                        maksymalnaWartosc);
                 }
-                
+
                 dw.drukujSeparator();
-                
+
             }
-            
+
             /*
              * Warunek wydruku kostki miniaturek
              */
             if (dodajKostkeMiniaturek) {
-                
+
                 Iterator<Photo> ip = zdjecia.iterator();
                 int zdjecieWKostce = 1;
-                
+
                 while(ip.hasNext()) {
-                    
+
                     Photo zdjecie = ip.next();
-                    
+
                     dw.drukuj(
-                        "<a href=\"" 
-                        + zdjecie.getUrl() 
-                        + "\" " 
-                        + "title=\"" 
-                        + zdjecie.getTitle() 
-                        + " by " 
-                        + zdjecie.getOwner().getUsername() 
+                        "<a href=\""
+                        + zdjecie.getUrl()
+                        + "\" "
+                        + "title=\""
+                        + zdjecie.getTitle()
+                        + " by "
+                        + zdjecie.getOwner().getUsername()
                         + ", on Flickr\">"
-                        + "<img src=\"" 
-                        + zdjecie.getSmallSquareUrl() 
+                        + "<img src=\""
+                        + zdjecie.getSmallSquareUrl()
                         + "\" "
                         + "width=\"75\" "
                         + "height=\"75\" "
-                        + "alt=\"" 
-                        + zdjecie.getTitle() 
+                        + "alt=\""
+                        + zdjecie.getTitle()
                         + "\" /></a>");
-                    
+
                     /*
                      * Na koniec wiersza i po ostatnim zdjęciu chcemy mieć
                      * znak nowej linii
                      */
                     if (zdjecieWKostce % liczbaZdjecWierszaKostkiMiniaturek == 0
-                        || !ip.hasNext()) 
+                        || !ip.hasNext())
                     {
                         dw.drukujLinie("");
                     }
-                    
+
                     zdjecieWKostce++;
-                    
+
                 }
-                
+
                 dw.drukujSeparator();
-                
+
             }
-            
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -343,9 +349,14 @@ public class ZdjecieMiesiaca {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        
+
+        return ILogika.WYKONANIE_POPRAWNE;
     }
-    
+
+    public void podlaczGUI(KontrolerGUI kontroler) {
+        this.kgui = kontroler;
+    }
+
     /**
      * Nagłówek dla słupka z punktacją     
      */
