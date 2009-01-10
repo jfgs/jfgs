@@ -14,7 +14,7 @@ import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
-import jfgs.zm.logika.JFlickrGroupStats;
+import jfgs.zm.logika.ZdjecieMiesiaca;
 
 /**
  *
@@ -70,7 +70,7 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
 
                 @Override
                 public void run() {
-                    new JFlickrGroupStats(kgui.getGroupId(), kgui);
+                    new ZdjecieMiesiaca(kgui.getGroupId(), kgui);
                 }
                 
             };
