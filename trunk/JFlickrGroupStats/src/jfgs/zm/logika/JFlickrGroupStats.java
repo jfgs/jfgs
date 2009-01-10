@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package jfgs.logika;
+package jfgs.zm.logika;
 
 import jfgs.narzedzia.DaneWyjsciowe;
 import com.aetrion.flickr.groups.pools.PoolsInterface;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 import com.aetrion.flickr.photos.comments.Comment;
 import java.util.ArrayList;
 import java.util.Arrays;
-import jfgs.gui.KontrolerGUI;
+import jfgs.zm.gui.KontrolerGUI;
 
 /**
  * Logika liczenia statystyk

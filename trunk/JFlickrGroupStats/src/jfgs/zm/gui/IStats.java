@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package jfgs.gui;
+package jfgs.zm.gui;
 
 import java.text.ParseException;
 import java.util.Date;
