@@ -77,7 +77,8 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         rokOd.setEditable(czyDoEdycji);
         rokDo.setEditable(czyDoEdycji);
         groupIdField.setEditable(czyDoEdycji);
-        generuj.setEnabled(czyDoEdycji);        
+        generuj.setEnabled(czyDoEdycji);
+        rodzajLogiki.setEnabled(czyDoEdycji);
     }
     
     /** Creates new form StatsFrame */
