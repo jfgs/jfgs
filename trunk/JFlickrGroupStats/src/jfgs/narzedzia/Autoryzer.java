@@ -17,7 +17,7 @@ import org.xml.sax.SAXException;
 import java.awt.Desktop;
 import java.net.URI;
 import javax.swing.JOptionPane;
-import jfgs.zm.gui.KontrolerGUI;
+import jfgs.gui.KontrolerGUI;
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.REST;
 import com.aetrion.flickr.util.AuthStore;
