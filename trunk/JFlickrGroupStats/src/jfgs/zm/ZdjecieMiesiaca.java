@@ -350,6 +350,8 @@ public class ZdjecieMiesiaca implements ILogika {
             ex.printStackTrace();
         }
 
+        dw.pokazOkno();
+
         return ILogika.WYKONANIE_POPRAWNE;
     }
 

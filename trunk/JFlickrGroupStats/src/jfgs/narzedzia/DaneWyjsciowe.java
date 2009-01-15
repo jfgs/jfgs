@@ -13,12 +13,18 @@ import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import jfgs.gui.PodgladFrame;
 
 /**
  * Klasa zarządzająca wypisaniem danych wyjściowych
  * @author michalus
  */
 public class DaneWyjsciowe {
+
+    /**
+     * Czy drukować na standardowe wyjście
+     */
+    public static final boolean drukujNaEkran = false;
 
     private NumberFormat nf;
     private DateFormat df;
@@ -41,9 +47,15 @@ public class DaneWyjsciowe {
      * @param s
      */
     public void drukuj(String s) {
+        
         try {
-            System.out.print(s);
+
+            if (drukujNaEkran) {
+                System.out.print(s);
+            }
+
             doPliku(s);
+
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -113,5 +125,16 @@ public class DaneWyjsciowe {
     public String formatujLiczbe(int n) {
         return nf.format(n);
     }
-    
+
+    /**
+     * Pokazuje okienko podglądu
+     */
+    public void pokazOkno() {
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new PodgladFrame(Constants.output).setVisible(true);
+            }
+        });
+    }
+
 }
