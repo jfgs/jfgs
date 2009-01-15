@@ -79,6 +79,10 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         groupIdField.setEditable(czyDoEdycji);
         generuj.setEnabled(czyDoEdycji);
         rodzajLogiki.setEnabled(czyDoEdycji);
+        jmDodaj.setEnabled(czyDoEdycji);
+        jmOdejmij.setEnabled(czyDoEdycji);
+        jmDzis.setEnabled(czyDoEdycji);
+        jmGeneruj.setEnabled(czyDoEdycji);
     }
     
     /** Creates new form StatsFrame */
@@ -106,29 +110,33 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
             System.exit(-1);
         }
         
-        /*
-         * Inicjujemy daty na miesiąc przed miesiącem bieżącym
-         */
-        {
-            Calendar c = Calendar.getInstance();
-            
-            rokDo.setText(""+c.get(Calendar.YEAR));
-            miesiacDo.setSelectedIndex(c.get(Calendar.MONTH));
-            
-            /*
-             * Jeżeli jesteśmy w styczniu to analizujemy poprzedni rok
-             */
-            if (c.get(Calendar.MONTH) == Calendar.JANUARY) {
-                rokOd.setText(""+(c.get(Calendar.YEAR)-1));
-                miesiacOd.setSelectedIndex(Calendar.DECEMBER);
-            } else {
-                rokOd.setText(""+c.get(Calendar.YEAR));
-                miesiacOd.setSelectedIndex(c.get(Calendar.MONTH)-1);
-            }
-        }
+        ustawDateDzisiejsza();
         
         akcjaZmianaWartosciIdGrupy();
         
+    }
+
+    /*
+     * Inicjujemy daty na miesiąc przed miesiącem bieżącym
+     */
+    private void ustawDateDzisiejsza() {
+
+        Calendar c = Calendar.getInstance();
+
+        rokDo.setText(""+c.get(Calendar.YEAR));
+        miesiacDo.setSelectedIndex(c.get(Calendar.MONTH));
+
+        /*
+         * Jeżeli jesteśmy w styczniu to analizujemy poprzedni rok
+         */
+        if (c.get(Calendar.MONTH) == Calendar.JANUARY) {
+            rokOd.setText(""+(c.get(Calendar.YEAR)-1));
+            miesiacOd.setSelectedIndex(Calendar.DECEMBER);
+        } else {
+            rokOd.setText(""+c.get(Calendar.YEAR));
+            miesiacOd.setSelectedIndex(c.get(Calendar.MONTH)-1);
+        }
+
     }
 
     /** This method is called from within the constructor to
@@ -157,6 +165,15 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         jLabel6 = new javax.swing.JLabel();
         rodzajLogiki = new javax.swing.JComboBox();
         jLabel7 = new javax.swing.JLabel();
+        jMenu = new javax.swing.JMenuBar();
+        jmPlik = new javax.swing.JMenu();
+        jmGeneruj = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JSeparator();
+        jmZakoncz = new javax.swing.JMenuItem();
+        jmEdytuj = new javax.swing.JMenu();
+        jmDzis = new javax.swing.JMenuItem();
+        jmDodaj = new javax.swing.JMenuItem();
+        jmOdejmij = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("JFlickrGroupStats");
@@ -210,6 +227,68 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
 
         jLabel7.setText("Rodzaj:");
 
+        jmPlik.setMnemonic('P');
+        jmPlik.setText("Plik");
+
+        jmGeneruj.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_MASK));
+        jmGeneruj.setMnemonic('G');
+        jmGeneruj.setText("Generuj");
+        jmGeneruj.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmGenerujActionPerformed(evt);
+            }
+        });
+        jmPlik.add(jmGeneruj);
+        jmPlik.add(jSeparator1);
+
+        jmZakoncz.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Q, java.awt.event.InputEvent.CTRL_MASK));
+        jmZakoncz.setMnemonic('Z');
+        jmZakoncz.setText("Zakończ");
+        jmZakoncz.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmZakonczActionPerformed(evt);
+            }
+        });
+        jmPlik.add(jmZakoncz);
+
+        jMenu.add(jmPlik);
+
+        jmEdytuj.setMnemonic('E');
+        jmEdytuj.setText("Edytuj");
+
+        jmDzis.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_MASK));
+        jmDzis.setText("Data dzisiejsza");
+        jmDzis.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmDzisActionPerformed(evt);
+            }
+        });
+        jmEdytuj.add(jmDzis);
+
+        jmDodaj.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_UP, java.awt.event.InputEvent.CTRL_MASK));
+        jmDodaj.setMnemonic('D');
+        jmDodaj.setText("Dodaj miesiąc");
+        jmDodaj.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmDodajActionPerformed(evt);
+            }
+        });
+        jmEdytuj.add(jmDodaj);
+
+        jmOdejmij.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DOWN, java.awt.event.InputEvent.CTRL_MASK));
+        jmOdejmij.setMnemonic('O');
+        jmOdejmij.setText("Odejmij miesiąc");
+        jmOdejmij.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmOdejmijActionPerformed(evt);
+            }
+        });
+        jmEdytuj.add(jmOdejmij);
+
+        jMenu.add(jmEdytuj);
+
+        setJMenuBar(jMenu);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -220,8 +299,8 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(generuj)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(authLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE))
-                    .addComponent(postepOperacji, javax.swing.GroupLayout.DEFAULT_SIZE, 444, Short.MAX_VALUE)
+                        .addComponent(authLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
+                    .addComponent(postepOperacji, javax.swing.GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
@@ -276,7 +355,7 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(rodzajLogiki, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 84, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 65, Short.MAX_VALUE)
                 .addComponent(postepOperacji, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -295,6 +374,26 @@ private void generujActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 private void groupIdFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_groupIdFieldActionPerformed
     akcjaZmianaWartosciIdGrupy();
 }//GEN-LAST:event_groupIdFieldActionPerformed
+
+private void jmZakonczActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmZakonczActionPerformed
+    menuZakoncz();
+}//GEN-LAST:event_jmZakonczActionPerformed
+
+private void jmDodajActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmDodajActionPerformed
+    menuDodajMiesiac();
+}//GEN-LAST:event_jmDodajActionPerformed
+
+private void jmOdejmijActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmOdejmijActionPerformed
+    menuOdejmijMiesiac();
+}//GEN-LAST:event_jmOdejmijActionPerformed
+
+private void jmDzisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmDzisActionPerformed
+    ustawDateDzisiejsza();
+}//GEN-LAST:event_jmDzisActionPerformed
+
+private void jmGenerujActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmGenerujActionPerformed
+    akcjaGeneruj();
+}//GEN-LAST:event_jmGenerujActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel authLabel;
@@ -308,6 +407,15 @@ private void groupIdFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JMenuBar jMenu;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JMenuItem jmDodaj;
+    private javax.swing.JMenuItem jmDzis;
+    private javax.swing.JMenu jmEdytuj;
+    private javax.swing.JMenuItem jmGeneruj;
+    private javax.swing.JMenuItem jmOdejmij;
+    private javax.swing.JMenu jmPlik;
+    private javax.swing.JMenuItem jmZakoncz;
     private javax.swing.JComboBox miesiacDo;
     private javax.swing.JComboBox miesiacOd;
     private javax.swing.JProgressBar postepOperacji;
@@ -330,6 +438,41 @@ private void groupIdFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         return
             DateFormat.getDateInstance(DateFormat.SHORT).parse(
                 "01."+miesiacDo.getSelectedItem()+"."+rokDo.getText());        
+    }
+
+    private void menuZakoncz() {
+        System.exit(1);
+    }
+
+    private void menuDodajMiesiac() {
+        zmienDate(1);
+    }
+
+    private void menuOdejmijMiesiac() {
+        zmienDate(-1);
+    }
+
+    private void zmienDate(int miesiace) {
+
+        Calendar cOd = Calendar.getInstance();
+        Calendar cDo = Calendar.getInstance();
+
+        try {
+
+            cOd.setTime(dajDataOd());
+            cDo.setTime(dajDataDo());
+            cOd.add(Calendar.MONTH, miesiace);
+            cDo.add(Calendar.MONTH, miesiace);
+
+            rokOd.setText(""+(cOd.get(Calendar.YEAR)));
+            miesiacOd.setSelectedIndex(cOd.get(Calendar.MONTH));
+            rokDo.setText(""+(cDo.get(Calendar.YEAR)));
+            miesiacDo.setSelectedIndex(cDo.get(Calendar.MONTH));
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
