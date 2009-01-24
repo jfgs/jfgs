@@ -72,187 +72,196 @@ public class ZdjecieMiesiaca implements ILogika {
          */
         int liczbaWszystkichZdjecPuli = 0;
 
+        /*
+         * Kolekcja obiektów reprezentujących aktywność użytkownika, kluczem
+         * jest identyfikator użytkownika
+         */
+        HashMap<String, StatystykaAutora> aktywnosc = null;
+
+        /*
+         * Kolekcja zdjęć w zakresie kryteriów
+         */
+        ArrayList<Photo> zdjecia = null;
+
         try {
 
-            dw.drukujSeparator();
+            /*
+             * Nagłówek
+             */
+            {
 
-            dw.drukujLinie(
-                "Grupa: "
-                + kgui.getNazwaGrupy());
+                dw.drukujSeparator();
 
-            dw.drukujLinie(
-                "Zdjęcia dodane po "
-                + dw.formatujDate(kgui.dajDataOd())
-                + " i przed "
-                + dw.formatujDate(kgui.dajDataDo())
-                + ".");
+                dw.drukujLinie(
+                    "Grupa: "
+                    + kgui.getNazwaGrupy());
 
-            dw.drukujSeparator();
+                dw.drukujLinie(
+                    "Zdjęcia dodane po "
+                    + dw.formatujDate(kgui.dajDataOd())
+                    + " i przed "
+                    + dw.formatujDate(kgui.dajDataDo())
+                    + ".");
 
-
-
-            PoolsInterface pi = kgui.getFlickr().getPoolsInterface();
-            PhotoList listaZdjec = pi.getPhotos(kgui.getGroupId(), new String[]{}, 500, 1);
-
-            liczbaWszystkichZdjecPuli = listaZdjec.getTotal();
+            }
 
             /*
-             * Kolekcja obiektów reprezentujących aktywność użytkownika, kluczem
-             * jest identyfikator użytkownika
+             * Główna pętla, analiza zdjęć i wypisanie ich na ekran
              */
-            HashMap<String, StatystykaAutora> aktywnosc = new HashMap<String, StatystykaAutora>();
+            {
+                dw.drukujSeparator("Analizowane zdjęcia");
 
-            /*
-             * Kolekcja zdjęć w zakresie kryteriów
-             */
-            ArrayList<Photo> zdjecia = new ArrayList<Photo>();
+                PoolsInterface pi = kgui.getFlickr().getPoolsInterface();
+                PhotoList listaZdjec = pi.getPhotos(kgui.getGroupId(), new String[]{}, 500, 1);
 
-            Iterator i = listaZdjec.iterator();
+                liczbaWszystkichZdjecPuli = listaZdjec.getTotal();
 
-            /*
-             * Numer zdjęcia w puli zdjęć
-             */
-            int numerZdjeciaWPuli = 0;
+                aktywnosc = new HashMap<String, StatystykaAutora>();
+                zdjecia = new ArrayList<Photo>();
 
-            /*
-             * Numer zdjęcia w zakresie kryteriów przeszukiwania
-             */
-            int numerPrzetwarzanegoZdjecia = 0;
-
-            while (i.hasNext()) {
-
-                numerZdjeciaWPuli++;
+                Iterator i = listaZdjec.iterator();
 
                 /*
-                 * Przesuwamy pasek postępu
+                 * Numer zdjęcia w puli zdjęć
                  */
-                if (liczbaWszystkichZdjecPuli == 0) {
-                    kgui.ustawPostep(0);
-                } else {
-                    kgui.ustawPostep(
-                        (int) Math.round(
-                            (double) numerZdjeciaWPuli
-                                / (double) liczbaWszystkichZdjecPuli
-                                * 100));
-                }
+                int numerZdjeciaWPuli = 0;
 
                 /*
-                 * Następne zdjęcie w puli zdjęć
+                 * Numer zdjęcia w zakresie kryteriów przeszukiwania
                  */
-                Photo p = (Photo) i.next();
+                int numerPrzetwarzanegoZdjecia = 0;
 
-                /*
-                 * Warunek na kryteria wyboru zdjęć
-                 */
-                if (!p.getDateAdded().after(kgui.dajDataOd())
-                        || !p.getDateAdded().before(kgui.dajDataDo()))
-                {
+                while (i.hasNext()) {
 
-                    // zdjęcie poza zakresem badanych dat
-
-                } else {
-
-                    numerPrzetwarzanegoZdjecia++;
+                    numerZdjeciaWPuli++;
 
                     /*
-                     * Zapamiętujemy przetwarzane zdjęcia
+                     * Przesuwamy pasek postępu
                      */
-                    zdjecia.add(p);
-
-                    String nazwaZdjecia = p.getTitle().trim();
-                    if (nazwaZdjecia.length() == 0) {
-                        nazwaZdjecia = "(...)";
-                    }
-
-                    /*
-                     * Zliczanie zdjęć autora
-                     */
-                    if (aktywnosc.containsKey(p.getOwner().getId())) {
-                        StatystykaAutora s = aktywnosc.get(p.getOwner().getId());
-                        s.dodajZdjecie();
-                        aktywnosc.put(
-                            p.getOwner().getId(), s);
+                    if (liczbaWszystkichZdjecPuli == 0) {
+                        kgui.ustawPostep(0);
                     } else {
-                        aktywnosc.put(
-                            p.getOwner().getId(),
-                            new StatystykaAutora(0, 1, p.getOwner().getUsername()));
+                        kgui.ustawPostep(
+                            (int) Math.round(
+                                (double) numerZdjeciaWPuli
+                                    / (double) liczbaWszystkichZdjecPuli
+                                    * 100));
                     }
 
-                    CommentsInterface ci = kgui.getFlickr().getCommentsInterface();
-                    Collection komentarze = ci.getList(p.getId());
-                    Iterator ic = komentarze.iterator();
-
-                    dw.drukujLinie(
-                        dw.formatujLiczbe(numerPrzetwarzanegoZdjecia)
-                        + ": "
-                        + "<a href=\""
-                        + p.getUrl()
-                        + "\">"
-                        + nazwaZdjecia
-                        + "</a>"
-                        + " by "
-                        + p.getOwner().getUsername()
-                        + " ("
-                        + (komentarze.size() == 0
-                            ? "<b>" + komentarze.size() + "</b>"
-                            : "" + komentarze.size())
-                        + ")"
-                        + ", "
-                        + dw.formatujDate(p.getDateAdded()));
+                    /*
+                     * Następne zdjęcie w puli zdjęć
+                     */
+                    Photo p = (Photo) i.next();
 
                     /*
-                     * Zliczanie komentarzy autora
+                     * Warunek na kryteria wyboru zdjęć
                      */
-                    while (ic.hasNext()) {
+                    if (!p.getDateAdded().after(kgui.dajDataOd())
+                            || !p.getDateAdded().before(kgui.dajDataDo()))
+                    {
 
-                        Comment komentarz = (Comment) ic.next();
+                        // zdjęcie poza zakresem badanych dat
 
-                        if (p.getOwner().getId().equals(komentarz.getAuthor())) {
-                            // Swoich komentarzy nie liczymy
-                        } else {
-                            if (aktywnosc.containsKey(komentarz.getAuthor())) {
-                                StatystykaAutora s = aktywnosc.get(komentarz.getAuthor());
-                                s.dodajKomentarz();
-                                aktywnosc.put(komentarz.getAuthor(), s);
-                            } else {
-                                aktywnosc.put(
-                                    komentarz.getAuthor(),
-                                    new StatystykaAutora(1, 0, komentarz.getAuthorName()));
-                            }
+                    } else {
+
+                        numerPrzetwarzanegoZdjecia++;
+
+                        /*
+                         * Zapamiętujemy przetwarzane zdjęcia
+                         */
+                        zdjecia.add(p);
+
+                        String nazwaZdjecia = p.getTitle().trim();
+                        if (nazwaZdjecia.length() == 0) {
+                            nazwaZdjecia = "(...)";
                         }
 
-                    } // komentarze
+                        /*
+                         * Zliczanie zdjęć autora
+                         */
+                        if (aktywnosc.containsKey(p.getOwner().getId())) {
+                            StatystykaAutora s = aktywnosc.get(p.getOwner().getId());
+                            s.dodajZdjecie();
+                            aktywnosc.put(
+                                p.getOwner().getId(), s);
+                        } else {
+                            aktywnosc.put(
+                                p.getOwner().getId(),
+                                new StatystykaAutora(0, 1, p.getOwner().getUsername()));
+                        }
 
-                } // w zakresie dat
+                        CommentsInterface ci = kgui.getFlickr().getCommentsInterface();
+                        Collection komentarze = ci.getList(p.getId());
+                        Iterator ic = komentarze.iterator();
+
+                        dw.drukujLinie(
+                            dw.formatujLiczbe(numerPrzetwarzanegoZdjecia)
+                            + ": "
+                            + "<a href=\""
+                            + p.getUrl()
+                            + "\">"
+                            + nazwaZdjecia
+                            + "</a>"
+                            + " by "
+                            + p.getOwner().getUsername()
+                            + " ("
+                            + (komentarze.size() == 0
+                                ? "<b>" + komentarze.size() + "</b>"
+                                : "" + komentarze.size())
+                            + ")"
+                            + ", "
+                            + dw.formatujDate(p.getDateAdded()));
+
+                        /*
+                         * Zliczanie komentarzy autora
+                         */
+                        while (ic.hasNext()) {
+
+                            Comment komentarz = (Comment) ic.next();
+
+                            if (p.getOwner().getId().equals(komentarz.getAuthor())) {
+                                // Swoich komentarzy nie liczymy
+                            } else {
+                                if (aktywnosc.containsKey(komentarz.getAuthor())) {
+                                    StatystykaAutora s = aktywnosc.get(komentarz.getAuthor());
+                                    s.dodajKomentarz();
+                                    aktywnosc.put(komentarz.getAuthor(), s);
+                                } else {
+                                    aktywnosc.put(
+                                        komentarz.getAuthor(),
+                                        new StatystykaAutora(1, 0, komentarz.getAuthorName()));
+                                }
+                            }
+
+                        } // komentarze
+
+                    } // w zakresie dat
+
+                    /*
+                     * Optymalizacja, zdjęć za datą końcową nie analizujemy
+                     */
+                    if (p.getDateAdded().before(kgui.dajDataOd())) {
+                        break;
+                    }
+
+                } // wszystkie zdjęcia w puli
 
                 /*
-                 * Optymalizacja, zdjęć za datą końcową nie analizujemy
+                 * Pasek ustawiony do końca
                  */
-                if (p.getDateAdded().before(kgui.dajDataOd())) {
-                    break;
-                }
-
-            } // wszystkie zdjęcia w puli
-
-
+                kgui.ustawPostep(100);
+            }
 
             /*
              * Poniżej akcje wykonane po przeanalizowaniu całej puli zdjęć
              */
 
-
-
-            /*
-             * Pasek ustawiony do końca
-             */
-            kgui.ustawPostep(100);
-
-            dw.drukujSeparator();
-
             /*
              * Wydruk wydruku "pasków" ocen
              */
             if (dodajPodsumowanieZbiorcze) {
+
+                dw.drukujSeparator("Podsumowanie");
 
                 /*
                  * Przeszukanie wartości ocen wszystkich użytkowników, wyszukanie
@@ -288,14 +297,14 @@ public class ZdjecieMiesiaca implements ILogika {
                         maksymalnaWartosc);
                 }
 
-                dw.drukujSeparator();
-
             }
 
             /*
              * Warunek wydruku kostki miniaturek
              */
             if (dodajKostkeMiniaturek) {
+
+                dw.drukujSeparator("Podgląd zdjęć");
 
                 Iterator<Photo> ip = zdjecia.iterator();
                 int zdjecieWKostce = 1;
@@ -336,13 +345,16 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 }
 
-                dw.drukujSeparator();
-
             }
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+        /*
+         * Ostatni separator przed zamknięciem pliku
+         */
+        dw.drukujSeparator();
 
         try {
             dw.zamknijPlik();

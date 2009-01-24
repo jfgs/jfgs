@@ -100,12 +100,30 @@ public class DaneWyjsciowe {
             out.close();
         }
     }
-    
+
+    /**
+     * Wydruk separatora graficznego z nagłówkiem
+     * @param naglowek
+     */
+    public void drukujSeparator(String naglowek) {
+
+        if ("".equals(naglowek)) {
+            naglowek = "***" ;
+        } else {
+            naglowek = "* "+naglowek+" *";
+        }
+
+        drukujLinie(
+            "\n(<b>"
+            + naglowek
+            + "</b>)\n");
+    }
+
     /**
      * Wydruk separatora graficzny
      */
     public void drukujSeparator() {
-        drukujLinie("\n(<b>***</b>)\n");
+        drukujSeparator("");
     }
     
     /**
