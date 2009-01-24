@@ -51,6 +51,19 @@ public class ZdjecieMiesiaca implements ILogika {
      * do komentarzy
      */
     private static final int liczbaZdjecWierszaKostkiMiniaturek = 5;
+
+    /**
+     * Czy generujemy zestawienie zdjęć najbardziej oglądanych
+     * @see liczbaZestawieniaNajbardziejPopularnych
+     * @deprecated Funkcja getViews w API nie działa i zwraca zawsze -1
+     */
+    private static final boolean dodajPodsumowaniePopularnosci = false;
+
+    /**
+     * Liczba zestawienia zdjęć najbardziej popularnych
+     * @see dodajPodsumowaniePopularnosci
+     */
+    private static final int liczbaZestawieniaNajbardziejPopularnych = 10;
     
     private KontrolerGUI kgui;
     private DaneWyjsciowe dw;
@@ -171,11 +184,6 @@ public class ZdjecieMiesiaca implements ILogika {
                          */
                         zdjecia.add(p);
 
-                        String nazwaZdjecia = p.getTitle().trim();
-                        if (nazwaZdjecia.length() == 0) {
-                            nazwaZdjecia = "(...)";
-                        }
-
                         /*
                          * Zliczanie zdjęć autora
                          */
@@ -200,7 +208,7 @@ public class ZdjecieMiesiaca implements ILogika {
                             + "<a href=\""
                             + p.getUrl()
                             + "\">"
-                            + nazwaZdjecia
+                            + dajNazweZdjecia(p.getTitle())
                             + "</a>"
                             + " by "
                             + p.getOwner().getUsername()
@@ -296,6 +304,77 @@ public class ZdjecieMiesiaca implements ILogika {
                         minimalnaWartosc,
                         maksymalnaWartosc);
                 }
+
+            }
+
+            /*
+             * Warunek zestawienia TOP wg popularności
+             */
+            if (dodajPodsumowaniePopularnosci) {
+                
+                Photo[] top = new Photo[liczbaZestawieniaNajbardziejPopularnych];
+                Iterator<Photo> ip = zdjecia.iterator();
+
+                while(ip.hasNext()) {
+
+                    Photo p = ip.next();
+
+                    /*
+                     * Czy zdjęcie wchodzi na ostatnią pozycję listy TOP
+                     */
+                    if (top[top.length-1] == null 
+                        || p.getViews() >= top[top.length-1].getViews())
+                    {
+
+                        top[top.length-1] = p;
+
+                        /*
+                         * Czy trzeba sortować zdjęcia powyżej
+                         */
+                        for(int i=top.length-2; i>=0; i--) {
+
+                            Photo tmpT = null;
+
+                            if (top[i] == null
+                                || top[i].getViews() <= top[i+1].getViews())
+                            {
+                                tmpT = top[i];
+                                top[i] = top[i+1];
+                                top[i+1] = tmpT;
+                            }
+                            
+                        } // wszystkie zdjęcia powyżej ostatniego
+
+                    } // jeżeli przedostatnie nieposortowane
+
+                } // wszystkie zdjęcia
+
+                dw.drukujSeparator("TOP"+liczbaZestawieniaNajbardziejPopularnych);
+
+                for(int i=0; i<top.length; i++) {
+
+                    if (top[i] != null) {
+                        dw.drukujLinie(
+                            dw.formatujLiczbe(i)
+                            + ": "
+                            + "<a href=\""
+                            + top[i].getUrl()
+                            + "\">"
+                            + dajNazweZdjecia(top[i].getTitle())
+                            + "</a>"
+                            + " by "
+                            + top[i].getOwner().getUsername()
+                            + " "
+                            + top[i].getViews()
+                            );
+                    } else {
+                        dw.drukujLinie(
+                            dw.formatujLiczbe(i)
+                            + ": "
+                            );
+                    }
+
+                } // podsumowanie całego TOP
 
             }
 
@@ -468,6 +547,19 @@ public class ZdjecieMiesiaca implements ILogika {
         
         dw.drukujLinie(linia);
         
-    }    
+    }
+
+    /**
+     * Zamienia pustę nazwę zdjęcia
+     * @param nazwa
+     * @return
+     */
+    private String dajNazweZdjecia(String nazwa) {
+        String n = nazwa.trim();
+        if ("".equals(n)) {
+            n = "(...)";
+        }
+        return n;
+    }
         
 }
