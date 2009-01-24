@@ -26,7 +26,7 @@ public class PogromcaLogiki {
      * Analiza komentarzy
      * @see AnalizaKomentarzy
      */
-    public static final String LOGIKA_ANALIZA_KOMENTARZY = "Analiza komentarzy";
+    public static final String LOGIKA_ANALIZA_KOMENTARZY = "Analiza komentarzy (wersja alfa)";
 
 
 
