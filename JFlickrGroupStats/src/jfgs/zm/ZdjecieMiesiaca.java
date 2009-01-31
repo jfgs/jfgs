@@ -7,6 +7,7 @@ package jfgs.zm;
 
 import jfgs.narzedzia.DaneWyjsciowe;
 import com.aetrion.flickr.groups.pools.PoolsInterface;
+import com.aetrion.flickr.photos.Extras;
 import com.aetrion.flickr.photos.PhotoList;
 import java.io.IOException;
 import java.util.Iterator;
@@ -17,6 +18,8 @@ import java.util.HashMap;
 import com.aetrion.flickr.photos.comments.Comment;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import jfgs.gui.KontrolerGUI;
 import jfgs.narzedzia.ILogika;
 
@@ -55,9 +58,8 @@ public class ZdjecieMiesiaca implements ILogika {
     /**
      * Czy generujemy zestawienie zdjęć najbardziej oglądanych
      * @see liczbaZestawieniaNajbardziejPopularnych
-     * @deprecated Funkcja getViews w API nie działa i zwraca zawsze -1
      */
-    private static final boolean dodajPodsumowaniePopularnosci = false;
+    private static final boolean dodajPodsumowaniePopularnosci = true;
 
     /**
      * Liczba zestawienia zdjęć najbardziej popularnych
@@ -125,7 +127,21 @@ public class ZdjecieMiesiaca implements ILogika {
                 dw.drukujSeparator("Analizowane zdjęcia");
 
                 PoolsInterface pi = kgui.getFlickr().getPoolsInterface();
-                PhotoList listaZdjec = pi.getPhotos(kgui.getGroupId(), new String[]{}, 500, 1);
+
+                Set dodatkoweParametry = new HashSet();
+                dodatkoweParametry.add(Extras.VIEWS);
+
+                /*
+                 * Ustawiamy wszystkie "extras" bo chcemy mieć informacje o
+                 * liczbie odsłąnięć zdjęcia
+                 */
+                PhotoList 
+                    listaZdjec = pi.getPhotos(
+                        kgui.getGroupId(),
+                        new String[]{},
+                        dodatkoweParametry,
+                        500,
+                        1);
 
                 liczbaWszystkichZdjecPuli = listaZdjec.getTotal();
 
@@ -355,7 +371,7 @@ public class ZdjecieMiesiaca implements ILogika {
 
                     if (top[i] != null) {
                         dw.drukujLinie(
-                            dw.formatujLiczbe(i)
+                            dw.formatujLiczbe(i+1)
                             + ": "
                             + "<a href=\""
                             + top[i].getUrl()
