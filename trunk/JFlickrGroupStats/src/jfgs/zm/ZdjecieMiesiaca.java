@@ -329,6 +329,14 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 dw.drukujSeparator("Podsumowanie");
 
+                dw.drukujLinie(
+                      "Wykres poniżej prezentuje liczbę dodanych szczerych komentarzy"
+                    + " do liczby zdjęć dodanych do grupy. Komentarze autora"
+                    + " pod własnym zdjęciem nie są liczone. Kolejne "
+                    + "komentarze pod cudzym zdjęciem liczone są jako 1/10 "
+                    + "punkta.");
+                dw.drukujLinie("");
+
                 /*
                  * Przeszukanie wartości ocen wszystkich użytkowników, wyszukanie
                  * najlepszej i najgorszej oceny do wydruku paska ocen
