@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 import jfgs.gui.KontrolerGUI;
 import jfgs.narzedzia.ILogika;
+import jfgs.narzedzia.WykresSlupkowy;
 
 /**
  * "Zdjęcie miesiąca" to logika pozwalająca podsumować dowolnie wybrany okres
@@ -309,18 +310,31 @@ public class ZdjecieMiesiaca implements ILogika {
                     }
                 }
 
-                Object[] st = aktywnosc.values().toArray();
-                Arrays.sort(st);
+                StatystykaAutora[] sat = new StatystykaAutora[aktywnosc.size()];
+                aktywnosc.values().toArray(sat);
+                Arrays.sort(sat);
 
-                drukujNaglowekOcen();
+                {
+                    WykresSlupkowy ws = new WykresSlupkowy();
 
-                for (Object o : st) {
-                    drukujPasekOcen(
-                        (StatystykaAutora) o,
-                        minimalnaWartosc,
-                        maksymalnaWartosc);
+                    for (StatystykaAutora sa : sat) {
+
+                        // Użytkowników nie dodających zdjęć nie drukujemy
+                        if (sa.dajLiczbeZdjec() != 0) {
+                            ws.add(
+                                sa.dajNazwe(),
+                                sa.dajLiczbeZdjec()
+                                    + "/"
+                                    + sa.dajLiczbeKomentarzy(), 
+                                sa.dajWartosc());
+                        }
+                        
+                    }
+
+                    dw.drukuj(ws.get());
+
                 }
-
+                
             }
 
             /*
@@ -464,105 +478,6 @@ public class ZdjecieMiesiaca implements ILogika {
 
     public void podlaczGUI(KontrolerGUI kontroler) {
         this.kgui = kontroler;
-    }
-
-    /**
-     * Nagłówek dla słupka z punktacją     
-     */
-    private void drukujNaglowekOcen() {
-        pasekOcen(null, 0, 0, true);
-    }
-    
-    /**
-     * Słupek z punktacją
-     * @param s tablica ocen
-     * @param minimalna wartość dla funkcji oceny
-     * @param maksymalna wartość dla funkcji oceny
-     */
-    private void drukujPasekOcen(StatystykaAutora s, int minimalna, int maksymalna) {
-        pasekOcen(s, minimalna, maksymalna, false);
-    }    
-    
-    /*
-     * Narzędziowa funkcja drukująca pasek lub nagłówek
-     */
-    private void pasekOcen(StatystykaAutora s, int minimalna, int maksymalna, boolean czyNaglowek) {
-        
-        /*
-         * Użytkowników nie dodających zdjęć nie drukujemy
-         */
-        if (!czyNaglowek && s.dajLiczbeZdjec() == 0) {
-            return;
-        }
-        
-        final int dlugoscUyztkownika = 20;
-        final int dlugoscBelki = 30;
-        String linia = "";
-        
-        /*
-         * Nazwa użytkownika
-         */
-        String uzytkownik = "";
-        if (czyNaglowek) {
-            uzytkownik = "~";
-        } else {
-            uzytkownik = s.dajNazwe().trim();
-        }
-        
-        if (uzytkownik.length()>dlugoscUyztkownika) {
-            uzytkownik = uzytkownik.substring(0, dlugoscUyztkownika);
-        }
-        while (uzytkownik.length()<dlugoscUyztkownika) {
-            uzytkownik = uzytkownik + " ";
-        }
-        
-        linia = uzytkownik+" ";
-        
-        /*
-         * Długość słupka i rysowanie słupka
-         */
-        double p = 0;
-        if (!czyNaglowek) {
-            p = 
-                ((double) (s.dajWartosc() - minimalna) 
-                    / (double) (maksymalna - minimalna))
-                * dlugoscBelki;
-            p = Math.round(p);
-        } else {
-            p = 0;
-        }
-        
-        if (graficznyPasekPodsumowania) {
-            for (int i=0; i<dlugoscBelki; i++) {
-                if (i<p) {
-                    linia = linia + "#";
-                } else {
-                    linia = linia + ".";
-                }                    
-            }
-        }
-        
-        if (!czyNaglowek) {
-            /*
-             * Punktacja
-             */
-            linia = linia 
-                + " [" 
-                + s.dajLiczbeKomentarzy() 
-                + "/" 
-                + s.dajLiczbeZdjec()
-                + "/" 
-                + s.dajWartosc()+"]";
-        } else {
-            linia = linia 
-                + " [komentarze"                 
-                + "/zdjęcia"                 
-                + "/wartość" 
-                +"]";
-        }
-        
-        dw.drukujLinie(linia);
-        
     }
 
     /**
