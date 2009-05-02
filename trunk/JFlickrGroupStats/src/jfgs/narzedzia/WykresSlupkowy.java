@@ -3,6 +3,7 @@
 
 package jfgs.narzedzia;
 
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Vector;
 
@@ -13,25 +14,29 @@ import java.util.Vector;
  */
 public class WykresSlupkowy {
 
+    private static NumberFormat nf;
+
     /**
      * Opis wykresu
      */
     private class OpisWykresu implements Comparable<OpisWykresu> {
 
-        private int y;
+        private double y;
         private String x;
         private String opis;
 
-        public OpisWykresu(String x, String opis, int y) {
+        public OpisWykresu(String x, String opis, double y) {
             this.x = x;
             this.opis = opis;
             this.y = y;
+
+            getFormat();
         }
 
         /**
          * @return the y
          */
-        public int getY() {
+        public double getY() {
             return y;
         }
 
@@ -56,7 +61,7 @@ public class WykresSlupkowy {
          */
         public int compareTo(OpisWykresu o) {
             return
-                new Integer(
+                new Double(
                     this.getY()).compareTo(o.getY());
         }
 
@@ -66,12 +71,25 @@ public class WykresSlupkowy {
      * Tymczasowa struktura dla elementów wykresu
      */
     private Vector<OpisWykresu> opisWykresu;
-    
+
+    /**
+     * Zwraca formater liczb używany w wykresie
+     * @return
+     */
+    public NumberFormat getFormat() {
+        if (nf == null) {
+            nf = NumberFormat.getInstance();
+            nf.setMinimumFractionDigits(0);
+            nf.setMaximumFractionDigits(2);
+        }
+        return nf;
+    }
+
     public WykresSlupkowy() {
         this.opisWykresu = new Vector<WykresSlupkowy.OpisWykresu>(20);
     }
 
-    public void add(String x, String opis, int y) {
+    public void add(String x, String opis, double y) {
         this.opisWykresu.add(new OpisWykresu(x, opis, y));
     }
 
@@ -100,10 +118,10 @@ public class WykresSlupkowy {
 
                 // wysoki zgodnie z jego procentem maksymalnej wartości y
                 if (                    
-                    ((double) (wykres[0].getY() - wykres[j].getY())
+                    Math.round((double) (wykres[0].getY() - wykres[j].getY())
                         / (wykres[0].getY() - wykres[wykres.length-1].getY())
                         * 100)
-                    >= ((wiersze.length - 1 - i) * blok)
+                    >= Math.round((wiersze.length - 1 - i) * blok)
                 ) {
                     wiersze[i] += "▓";
                 } else {
@@ -149,9 +167,9 @@ public class WykresSlupkowy {
 
             // opis bieżacego wiersza
             stopka += " ";
-            stopka += wykres[i].getX()+", ";
-            stopka += wykres[i].getY()+" (";
-            stopka += wykres[i].getOpis()+")";
+            stopka += wykres[i].getX() + ", ";
+            stopka += nf.format(wykres[i].getY()) + " (";
+            stopka += wykres[i].getOpis() + ")";
 
             sb.append(stopka + "\n");
 
@@ -164,16 +182,16 @@ public class WykresSlupkowy {
 //
 //        WykresSlupkowy ws = new WykresSlupkowy();
 //
-//        ws.add("jeden", "opis jedynki", 1);
-//        ws.add("dsd", "opis jedynki", 2);
-//        ws.add("jen", "opis jedynki", 0);
-//        ws.add("jsden", "opis jedynki", 22);
+//        ws.add("jeden", "opis jedynki", 1.1);
+//        ws.add("dsd", "opis jedynki", 1.4);
+//        ws.add("jen", "opis jedynki", 1.7);
+//        ws.add("jsden", "opis jedynki", 1.8);
 //        ws.add("jedddn", "opis jedynki", 5);
-//        ws.add("jedddn", "opis jedynki", -6);
-//        ws.add("dwa", "opis 222", 7);
-//        ws.add("trzy", "opis 333", 8);
-//        ws.add("cztery", "opis 444", 9);
-//        ws.add("pięć", "opis 555", 10);
+//        ws.add("jedddn", "opis jedynki", -2);
+//        ws.add("dwa", "opis 222", 1);
+//        ws.add("trzy", "opis 333", 2);
+//        ws.add("cztery", "opis 444", 3);
+//        ws.add("pięć", "opis 555", 4);
 //
 //        System.out.println(ws.get());
 //
