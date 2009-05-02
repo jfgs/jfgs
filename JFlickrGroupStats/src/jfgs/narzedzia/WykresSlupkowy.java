@@ -92,21 +92,22 @@ public class WykresSlupkowy {
         String[] wiersze = new String[wysokosc];
         Arrays.fill(wiersze, "");
 
-        // dla każdego x
-        for (OpisWykresu ow : wykres) {
+        // dla wiersza
+        for (int j=wykres.length - 1; j>=0; j--) {
 
-            // malujemy słupek y
+            // malujemy słupek
             for (int i=0; i<wiersze.length; i++) {
 
                 // wysoki zgodnie z jego procentem maksymalnej wartości y
-                if (
-                    (i * blok) >=
-                    ((double) (wykres[0].getY() - ow.getY())
+                if (                    
+                    ((double) (wykres[0].getY() - wykres[j].getY())
                         / (wykres[0].getY() - wykres[wykres.length-1].getY())
                         * 100)
+                    >= ((wiersze.length - 1 - i) * blok)
                 ) {
                     wiersze[i] += "▓";
                 } else {
+
                     wiersze[i] += "░";
                 }
 
@@ -148,8 +149,9 @@ public class WykresSlupkowy {
 
             // opis bieżacego wiersza
             stopka += " ";
-            stopka += wykres[i].getOpis()+", ";
-            stopka += wykres[i].getY();            
+            stopka += wykres[i].getX()+", ";
+            stopka += wykres[i].getY()+" (";
+            stopka += wykres[i].getOpis()+")";
 
             sb.append(stopka + "\n");
 
@@ -162,16 +164,16 @@ public class WykresSlupkowy {
 //
 //        WykresSlupkowy ws = new WykresSlupkowy();
 //
-//        ws.add("jeden", "opis jedynki", -5);
-//        ws.add("dsd", "opis jedynki", -4);
-//        ws.add("jen", "opis jedynki", -3);
-//        ws.add("jsden", "opis jedynki", -2);
-//        ws.add("jedddn", "opis jedynki", -1);
-//        ws.add("jedddn", "opis jedynki", -0);
-//        ws.add("dwa", "opis 222", 1);
-//        ws.add("trzy", "opis 333", 2);
-//        ws.add("cztery", "opis 444", 3);
-//        ws.add("pięć", "opis 555", 4);
+//        ws.add("jeden", "opis jedynki", 1);
+//        ws.add("dsd", "opis jedynki", 2);
+//        ws.add("jen", "opis jedynki", 0);
+//        ws.add("jsden", "opis jedynki", 22);
+//        ws.add("jedddn", "opis jedynki", 5);
+//        ws.add("jedddn", "opis jedynki", -6);
+//        ws.add("dwa", "opis 222", 7);
+//        ws.add("trzy", "opis 333", 8);
+//        ws.add("cztery", "opis 444", 9);
+//        ws.add("pięć", "opis 555", 10);
 //
 //        System.out.println(ws.get());
 //
