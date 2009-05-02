@@ -505,6 +505,14 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 }
 
+                dw.drukujLinie("");
+                dw.drukujLinie(
+                    "Wybrane zdjęcia poprzednich miesięcy można oglądać <a " +
+                    "href=\"http://www.flickr.com/groups/71956997@N00/pool/tags" +
+                    "/zdj%C4%99ciemiesi%C4%85cagrupyszczerekomentarze/\">w " +
+                    "zdjęciach grupy SK z tagiem <i>Zdjęcie miesiąca grupy " +
+                    "Szczere komentarze</i></a>.");
+
             }
 
         } catch (Exception ex) {
