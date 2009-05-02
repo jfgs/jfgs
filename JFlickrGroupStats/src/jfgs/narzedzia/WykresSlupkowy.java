@@ -122,7 +122,7 @@ public class WykresSlupkowy {
 
         // początek stopki
         for (int i=0; i<wykres.length; i++) {
-            sb.append("╥");
+            sb.append("╫");
         }
         sb.append("\n");
 
