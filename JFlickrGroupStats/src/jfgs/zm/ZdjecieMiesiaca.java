@@ -94,6 +94,11 @@ public class ZdjecieMiesiaca implements ILogika {
          */
         ArrayList<Photo> zdjecia = null;
 
+        /*
+         * Kod html do głosowania
+         */
+        StringBuffer kodhtml = new StringBuffer("");
+
         try {
 
             /*
@@ -121,7 +126,7 @@ public class ZdjecieMiesiaca implements ILogika {
              */
             {
                 dw.drukujSeparator("Analizowane zdjęcia");
-
+                
                 PoolsInterface pi = kgui.getFlickr().getPoolsInterface();
 
                 Set dodatkoweParametry = new HashSet();
@@ -214,6 +219,16 @@ public class ZdjecieMiesiaca implements ILogika {
                         Collection komentarze = ci.getList(p.getId());
                         Iterator ic = komentarze.iterator();
 
+                        kodhtml.append(
+                            dw.formatujLiczbe(numerPrzetwarzanegoZdjecia)
+                            + ": &lt;a href=&quot;"
+                            + p.getUrl()
+                            + "&quot;&gt;&lt;img src=&quot;"
+                            + p.getSmallUrl()
+                            + "&quot;&gt;&lt;/a&gt;"
+                            + "\n"
+                        );
+
                         dw.drukujLinie(
                             dw.formatujLiczbe(numerPrzetwarzanegoZdjecia)
                             + ": "
@@ -230,7 +245,8 @@ public class ZdjecieMiesiaca implements ILogika {
                                 : "" + komentarze.size())
                             + ")"
                             + ", "
-                            + dw.formatujDate(p.getDateAdded()));
+                            + dw.formatujDate(p.getDateAdded())
+                        );
 
                         // musimy zapamiętać kto już komentował to zdjęcie
                         Vector<String> komentowaliJuz = new Vector<String>(10);
@@ -512,6 +528,9 @@ public class ZdjecieMiesiaca implements ILogika {
                     "/zdj%C4%99ciemiesi%C4%85cagrupyszczerekomentarze/\">w " +
                     "zdjęciach grupy SK z tagiem <i>Zdjęcie miesiąca grupy " +
                     "Szczere komentarze</i></a>.");
+
+                dw.drukujSeparator("Kod HTML");
+                dw.drukujLinie(kodhtml.toString());
 
             }
 
