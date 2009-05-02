@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Vector;
 import jfgs.gui.KontrolerGUI;
 import jfgs.narzedzia.ILogika;
 import jfgs.narzedzia.WykresSlupkowy;
@@ -32,12 +33,6 @@ import jfgs.narzedzia.WykresSlupkowy;
  * @author michalus
  */
 public class ZdjecieMiesiaca implements ILogika {
-    
-    /**
-     * Wyłączam graficzny pasek podsumowania bo niemożliwe jest uzycie znaczników
-     * <pre> w komentarzach na Flick, wszystko się rozjeżdża
-     */
-    private static final boolean graficznyPasekPodsumowania = false;
     
     /**
      * Czy po liście zdjęć dodać podsumowanie zbiorcze: użytkownik, liczba
@@ -237,26 +232,72 @@ public class ZdjecieMiesiaca implements ILogika {
                             + ", "
                             + dw.formatujDate(p.getDateAdded()));
 
+                        // musimy zapamiętać kto już komentował to zdjęcie
+                        Vector<String> komentowaliJuz = new Vector<String>(10);
+
+                        // premiujemy pierwszy komentarz pod cudzym zdjęciem
+                        final double pierwszyKomentarz = 1;
+
+                        // słabiej premiujemy kolejny komentarz pod cudzym zdjęciem
+                        final double kolejnyKomentarz = 0.1;
+
                         /*
                          * Zliczanie komentarzy autora
                          */
                         while (ic.hasNext()) {
 
                             Comment komentarz = (Comment) ic.next();
-
+                            
                             if (p.getOwner().getId().equals(komentarz.getAuthor())) {
-                                // Swoich komentarzy nie liczymy
+                                
+                                // Komentarze pod zdjęciem autora nie liczymy
+
                             } else {
+
+                                // kolejne komentarze liczymy mniej hojnie
+
+                                boolean komentowalJuz = false;
+
+                                for (int j=0; j<komentowaliJuz.size(); j++) {
+                                    if (komentowaliJuz.get(j).equals(komentarz.getAuthor())) {
+                                        komentowalJuz = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!komentowalJuz) {
+                                    komentowaliJuz.add(komentarz.getAuthor());                                    
+                                }
+
                                 if (aktywnosc.containsKey(komentarz.getAuthor())) {
+
+                                    // aktualizujemy klucz
+
                                     StatystykaAutora s = aktywnosc.get(komentarz.getAuthor());
-                                    s.dodajKomentarz();
+
+                                    s.dodajKomentarz(
+                                            (komentowalJuz
+                                                ? kolejnyKomentarz
+                                                : pierwszyKomentarz));
+
                                     aktywnosc.put(komentarz.getAuthor(), s);
+
                                 } else {
+
+                                    // dodajemy nowy klucz
+
                                     aktywnosc.put(
                                         komentarz.getAuthor(),
-                                        new StatystykaAutora(1, 0, komentarz.getAuthorName()));
+                                        new StatystykaAutora(
+                                            (komentowalJuz 
+                                                ? kolejnyKomentarz
+                                                : pierwszyKomentarz),
+                                            0,
+                                            komentarz.getAuthorName())
+                                    );
                                 }
-                            }
+
+                            } // komentarz inny niż autora zdjęcia
 
                         } // komentarze
 
@@ -292,8 +333,8 @@ public class ZdjecieMiesiaca implements ILogika {
                  * Przeszukanie wartości ocen wszystkich użytkowników, wyszukanie
                  * najlepszej i najgorszej oceny do wydruku paska ocen
                  */
-                int maksymalnaWartosc = Integer.MIN_VALUE;
-                int minimalnaWartosc = Integer.MAX_VALUE;
+                double maksymalnaWartosc = Double.MIN_VALUE;
+                double minimalnaWartosc = Double.MAX_VALUE;
                 {
                     Iterator is = aktywnosc.keySet().iterator();
                     while (is.hasNext()) {
@@ -323,9 +364,11 @@ public class ZdjecieMiesiaca implements ILogika {
                         if (sa.dajLiczbeZdjec() != 0) {
                             ws.add(
                                 sa.dajNazwe(),
-                                sa.dajLiczbeZdjec()
-                                    + "/"
-                                    + sa.dajLiczbeKomentarzy(), 
+                                ws.getFormat().format(
+                                    sa.dajLiczbeZdjec())
+                                + "/"
+                                + ws.getFormat().format(
+                                    sa.dajLiczbeKomentarzy()),
                                 sa.dajWartosc());
                         }
                         
