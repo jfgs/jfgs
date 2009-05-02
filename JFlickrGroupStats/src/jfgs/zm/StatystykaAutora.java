@@ -13,10 +13,10 @@ package jfgs.zm;
 public class StatystykaAutora implements Comparable<StatystykaAutora> {
 
     private String nazwaUzytkownika;
-    private int dodanychZdjec;
-    private int dodanychKomentarzy;
+    private double dodanychZdjec;
+    private double dodanychKomentarzy;
     
-    public StatystykaAutora(int k, int z, String nazwa) {
+    public StatystykaAutora(double k, double z, String nazwa) {
         dodanychKomentarzy = k;
         dodanychZdjec = z;
         nazwaUzytkownika = nazwa;
@@ -25,7 +25,11 @@ public class StatystykaAutora implements Comparable<StatystykaAutora> {
     public StatystykaAutora() {
         this(0, 0, "");
     }
-    
+
+    public void dodajKomentarz(double wartosc) {
+        dodanychKomentarzy += wartosc;
+    }
+
     public void dodajKomentarz() {
         dodanychKomentarzy++;
     }
@@ -34,11 +38,11 @@ public class StatystykaAutora implements Comparable<StatystykaAutora> {
         dodanychZdjec++;
     }
     
-    public int dajLiczbeKomentarzy() {
+    public double dajLiczbeKomentarzy() {
         return dodanychKomentarzy;
     }
     
-    public int dajLiczbeZdjec() {
+    public double dajLiczbeZdjec() {
         return dodanychZdjec;
     }
     
@@ -46,7 +50,7 @@ public class StatystykaAutora implements Comparable<StatystykaAutora> {
         return nazwaUzytkownika;
     }
 
-    public int dajWartosc() {        
+    public double dajWartosc() {
         return (dodanychKomentarzy - dodanychZdjec);
     }
     
