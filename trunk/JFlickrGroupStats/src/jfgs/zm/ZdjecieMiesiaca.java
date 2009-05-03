@@ -223,9 +223,9 @@ public class ZdjecieMiesiaca implements ILogika {
                             dw.formatujLiczbe(numerPrzetwarzanegoZdjecia)
                             + ": &lt;a href=&quot;"
                             + p.getUrl()
-                            + "&quot;&gt;&lt;img src=&quot;"
+                            + "&quot;&gt ;&lt;img src=&quot;"
                             + p.getSmallUrl()
-                            + "&quot;&gt;&lt;/a&gt;"
+                            + "&quot;&gt; &lt;/a&gt;"
                             + "\n"
                         );
 
@@ -346,11 +346,13 @@ public class ZdjecieMiesiaca implements ILogika {
                 dw.drukujSeparator("Podsumowanie");
 
                 dw.drukujLinie(
-                      "Wykres poniżej prezentuje liczbę dodanych szczerych komentarzy"
-                    + " do liczby zdjęć dodanych do grupy. Komentarze autora"
+                      "Wykres poniżej prezentuje liczbę dodanych do grupy zdjęć do"
+                    + " liczby szczerych komentarzy (<i>zdjęcia</i> / <i>komentarze</i>). "
+                    + "Komentarze autora"
                     + " pod własnym zdjęciem nie są liczone. Kolejne "
                     + "komentarze pod cudzym zdjęciem liczone są jako 1/10 "
-                    + "punkta.");
+                    + "punkta. Jeżeli wynik końcowy jest ujemny oznacza to, że"
+                    + " dany użytkownik dodał więcej zdjęć niż szczerych komentarzy.");
                 dw.drukujLinie("");
 
                 /*
@@ -448,6 +450,9 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 dw.drukujSeparator("TOP"+liczbaZestawieniaNajbardziejPopularnych);
 
+                dw.drukujLinie("Poniżej najbardziej popularne zdjęcia wg liczby odsłon.");
+                dw.drukujLinie("");
+
                 for(int i=0; i<top.length; i++) {
 
                     if (top[i] != null) {
@@ -461,7 +466,7 @@ public class ZdjecieMiesiaca implements ILogika {
                             + "</a>"
                             + " by "
                             + top[i].getOwner().getUsername()
-                            + " "
+                            + " - "
                             + top[i].getViews()
                             );
                     } else {
@@ -530,6 +535,12 @@ public class ZdjecieMiesiaca implements ILogika {
                     "Szczere komentarze</i></a>.");
 
                 dw.drukujSeparator("Kod HTML");
+
+                dw.drukujLinie(
+                    "Poniżej kod HTML gotowy do skopiowania. Kod " +
+                    "zawiera odnośnik do zdjęcia wraz z jego miniaturą.");
+                dw.drukujLinie("");
+
                 dw.drukujLinie(kodhtml.toString());
 
             }
