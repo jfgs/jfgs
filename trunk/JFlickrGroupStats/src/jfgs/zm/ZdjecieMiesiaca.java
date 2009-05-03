@@ -223,9 +223,9 @@ public class ZdjecieMiesiaca implements ILogika {
                             dw.formatujLiczbe(numerPrzetwarzanegoZdjecia)
                             + ": &lt;a href=&quot;"
                             + p.getUrl()
-                            + "&quot;&gt ;&lt;img src=&quot;"
+                            + "&quot;&gt;&lt;img src=&quot;"
                             + p.getSmallUrl()
-                            + "&quot;&gt; &lt;/a&gt;"
+                            + "&quot;&gt;&lt;/a&gt;"
                             + "\n"
                         );
 
