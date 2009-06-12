@@ -82,6 +82,14 @@ public class KontrolerGUI {
         pasekPostepu.setValue(postep);
         pasekPostepu.repaint();
     }
+
+    /**
+     * Zmiana opisu dla paska postępu
+     * @param opis
+     */
+    public void ustawPostepStr(String opis) {
+        pasekPostepu.setString(opis);
+    }
     
     /**
      * Okno głównego interfejsu
