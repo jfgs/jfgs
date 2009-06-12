@@ -200,6 +200,8 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         miesiacDo.setSelectedIndex(8);
 
         postepOperacji.setFocusable(false);
+        postepOperacji.setString("");
+        postepOperacji.setStringPainted(true);
 
         generuj.setText("Generuj");
         generuj.addActionListener(new java.awt.event.ActionListener() {
@@ -355,7 +357,7 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(rodzajLogiki, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 65, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
                 .addComponent(postepOperacji, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)

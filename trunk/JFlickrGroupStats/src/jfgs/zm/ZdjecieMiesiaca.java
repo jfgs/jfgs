@@ -141,23 +141,26 @@ public class ZdjecieMiesiaca implements ILogika {
                 dodatkoweParametry.add(Extras.VIEWS);
 
                 /*
-                 * Ustawiamy wszystkie "extras" bo chcemy mieć informacje o
-                 * liczbie odsłąnięć zdjęcia
+                 * Liczba zdjęć na stronie
                  */
-                PhotoList 
-                    listaZdjec = pi.getPhotos(
-                        kgui.getGroupId(),
-                        new String[]{},
-                        dodatkoweParametry,
-                        500,
-                        1);
+                final int zdjecNaStrone = 30;
 
-                liczbaWszystkichZdjecPuli = listaZdjec.getTotal();
+                /*
+                 * Numer strony zdjęć w puli
+                 */
+                int strona = 1;
+                
+                /*
+                 * Liczba zdjęć załadowanych do iteratora, każda kolejna strona
+                 * zdjęć powiększy tą wartość
+                 */
+                int liczbaZaladowanychWIteratorze = 0;
 
-                aktywnosc = new HashMap<String, StatystykaAutora>();
-                zdjecia = new ArrayList<Photo>();
-
-                Iterator i = listaZdjec.iterator();
+                /*
+                 * Pula będzie odczytywana strona po stronie, aż do końca zdjęć
+                 * lub innego warunku wyjściowego
+                 */
+                boolean ladujKolejnaStrone = true;
 
                 /*
                  * Numer zdjęcia w puli zdjęć
@@ -169,177 +172,244 @@ public class ZdjecieMiesiaca implements ILogika {
                  */
                 int numerPrzetwarzanegoZdjecia = 0;
 
-                while (i.hasNext()) {
+                /*
+                 * Premiujemy pierwszy komentarz pod cudzym zdjęciem
+                 */
+                final double pierwszyKomentarz = 1;
 
-                    numerZdjeciaWPuli++;
+                /*
+                 * Słabiej premiujemy kolejny komentarz pod cudzym zdjęciem
+                 */
+                final double kolejnyKomentarz = 0.1;
 
-                    /*
-                     * Przesuwamy pasek postępu
-                     */
-                    if (liczbaWszystkichZdjecPuli == 0) {
-                        kgui.ustawPostep(0);
-                    } else {
-                        kgui.ustawPostep(
-                            (int) Math.round(
-                                (double) numerZdjeciaWPuli
-                                    / (double) liczbaWszystkichZdjecPuli
-                                    * 100));
-                    }
+                aktywnosc = new HashMap<String, StatystykaAutora>();
+                zdjecia = new ArrayList<Photo>();
 
-                    /*
-                     * Następne zdjęcie w puli zdjęć
-                     */
-                    Photo p = (Photo) i.next();
+                /*
+                 * @FIXME Zdjęcia w grupie ściągane są zdjęcie po zdjęciu, 
+                 * prawdopodobnie istnieje tutaj niebezpieczeństwo, że dodane
+                 * do grupy zdjęcie przesunie nasze okienko (stronę)
+                 */
+                while (ladujKolejnaStrone) {
 
                     /*
-                     * Warunek na kryteria wyboru zdjęć
+                     * Ustawiamy wszystkie "extras" bo chcemy mieć informacje o
+                     * liczbie odsłąnięć zdjęcia
                      */
-                    if (!p.getDateAdded().after(kgui.dajDataOd())
-                            || !p.getDateAdded().before(kgui.dajDataDo()))
-                    {
+                    PhotoList
+                        listaZdjec = pi.getPhotos(
+                            kgui.getGroupId(),
+                            new String[]{},
+                            dodatkoweParametry,
+                            zdjecNaStrone,
+                            strona);
 
-                        // zdjęcie poza zakresem badanych dat
+                    liczbaWszystkichZdjecPuli = listaZdjec.getTotal();
+                    liczbaZaladowanychWIteratorze += listaZdjec.size();
 
-                    } else {
+                    Iterator i = listaZdjec.iterator();
+                    
+                    while (i.hasNext()) {
 
-                        numerPrzetwarzanegoZdjecia++;
+                        numerZdjeciaWPuli++;
 
                         /*
-                         * Zapamiętujemy przetwarzane zdjęcia
+                         * Przesuwamy pasek postępu
                          */
-                        zdjecia.add(p);
+                        if (liczbaZaladowanychWIteratorze == 0) {
+                            
+                            kgui.ustawPostep(0);
 
-                        /*
-                         * Zliczanie zdjęć autora
-                         */
-                        if (aktywnosc.containsKey(p.getOwner().getId())) {
-                            StatystykaAutora s = aktywnosc.get(p.getOwner().getId());
-                            s.dodajZdjecie();
-                            aktywnosc.put(
-                                p.getOwner().getId(), s);
                         } else {
-                            aktywnosc.put(
-                                p.getOwner().getId(),
-                                new StatystykaAutora(0, 1, p.getOwner().getUsername()));
+                            
+                            kgui.ustawPostep(
+                                (int) Math.round(
+                                    (double) numerZdjeciaWPuli
+                                        / (double) (liczbaZaladowanychWIteratorze 
+                                            // mnożymy aby nigdy nie dojść zbyt blisko końca
+                                            * 1.1)
+                                        * 100));
+
+                            kgui.ustawPostepStr(
+                                "Strona " +
+                                strona +
+                                ", zdjęcie " +
+                                numerZdjeciaWPuli +
+                                "/" +
+                                liczbaZaladowanychWIteratorze +
+                                " (" +
+                                liczbaWszystkichZdjecPuli +
+                                ")");
+                            
                         }
 
-                        CommentsInterface ci = kgui.getFlickr().getCommentsInterface();
-                        Collection komentarze = ci.getList(p.getId());
-                        Iterator ic = komentarze.iterator();
-
-                        kodhtml.append(
-                            dw.formatujLiczbe(numerPrzetwarzanegoZdjecia)
-                            + ": &lt;a href=&quot;"
-                            + p.getUrl()
-                            + "&quot;&gt;&lt;img src=&quot;"
-                            + p.getSmallUrl()
-                            + "&quot;&gt;&lt;/a&gt;"
-                            + "\n"
-                        );
-
-                        dw.drukujLinie(
-                            dw.formatujLiczbe(numerPrzetwarzanegoZdjecia)
-                            + ": "
-                            + "<a href=\""
-                            + p.getUrl()
-                            + "\">"
-                            + dajNazweZdjecia(p.getTitle())
-                            + "</a>"
-                            + " by "
-                            + p.getOwner().getUsername()
-                            + " ("
-                            + (komentarze.size() == 0
-                                ? "<b>" + komentarze.size() + "</b>"
-                                : "" + komentarze.size())
-                            + ")"
-                            + ", "
-                            + dw.formatujDate(p.getDateAdded())
-                        );
-
-                        // musimy zapamiętać kto już komentował to zdjęcie
-                        Vector<String> komentowaliJuz = new Vector<String>(10);
-
-                        // premiujemy pierwszy komentarz pod cudzym zdjęciem
-                        final double pierwszyKomentarz = 1;
-
-                        // słabiej premiujemy kolejny komentarz pod cudzym zdjęciem
-                        final double kolejnyKomentarz = 0.1;
+                        /*
+                         * Następne zdjęcie z danej strony zdjęć
+                         */
+                        Photo p = (Photo) i.next();
 
                         /*
-                         * Zliczanie komentarzy autora
+                         * Warunek na kryteria wyboru zdjęć
                          */
-                        while (ic.hasNext()) {
+                        if (!p.getDateAdded().after(kgui.dajDataOd())
+                                || !p.getDateAdded().before(kgui.dajDataDo()))
+                        {
 
-                            Comment komentarz = (Comment) ic.next();
-                            
-                            if (p.getOwner().getId().equals(komentarz.getAuthor())) {
-                                
-                                // Komentarze pod zdjęciem autora nie liczymy
+                            // zdjęcie poza zakresem badanych dat
 
+                        } else {
+
+                            numerPrzetwarzanegoZdjecia++;
+
+                            /*
+                             * Zapamiętujemy przetwarzane zdjęcia
+                             */
+                            zdjecia.add(p);
+
+                            /*
+                             * Zliczanie zdjęć autora
+                             */
+                            if (aktywnosc.containsKey(p.getOwner().getId())) {
+                                StatystykaAutora s = aktywnosc.get(p.getOwner().getId());
+                                s.dodajZdjecie();
+                                aktywnosc.put(
+                                    p.getOwner().getId(), s);
                             } else {
+                                aktywnosc.put(
+                                    p.getOwner().getId(),
+                                    new StatystykaAutora(0, 1, p.getOwner().getUsername()));
+                            }
 
-                                // kolejne komentarze liczymy mniej hojnie
+                            CommentsInterface ci = kgui.getFlickr().getCommentsInterface();
+                            Collection komentarze = ci.getList(p.getId());
+                            Iterator ic = komentarze.iterator();
 
-                                boolean komentowalJuz = false;
+                            kodhtml.append(
+                                dw.formatujLiczbe(numerPrzetwarzanegoZdjecia)
+                                + ": &lt;a href=&quot;"
+                                + p.getUrl()
+                                + "&quot;&gt;&lt;img src=&quot;"
+                                + p.getSmallUrl()
+                                + "&quot;&gt;&lt;/a&gt;"
+                                + "\n"
+                            );
 
-                                for (int j=0; j<komentowaliJuz.size(); j++) {
-                                    if (komentowaliJuz.get(j).equals(komentarz.getAuthor())) {
-                                        komentowalJuz = true;
-                                        break;
-                                    }
-                                }
+                            dw.drukujLinie(
+                                dw.formatujLiczbe(numerPrzetwarzanegoZdjecia)
+                                + ": "
+                                + "<a href=\""
+                                + p.getUrl()
+                                + "\">"
+                                + dajNazweZdjecia(p.getTitle())
+                                + "</a>"
+                                + " by "
+                                + p.getOwner().getUsername()
+                                + " ("
+                                + (komentarze.size() == 0
+                                    ? "<b>" + komentarze.size() + "</b>"
+                                    : "" + komentarze.size())
+                                + ")"
+                                + ", "
+                                + dw.formatujDate(p.getDateAdded())
+                            );
 
-                                if (!komentowalJuz) {
-                                    komentowaliJuz.add(komentarz.getAuthor());                                    
-                                }
+                            // musimy zapamiętać kto już komentował to zdjęcie
+                            Vector<String> komentowaliJuz = new Vector<String>(10);
 
-                                if (aktywnosc.containsKey(komentarz.getAuthor())) {
+                            /*
+                             * Zliczanie komentarzy autora
+                             */
+                            while (ic.hasNext()) {
 
-                                    // aktualizujemy klucz
+                                Comment komentarz = (Comment) ic.next();
 
-                                    StatystykaAutora s = aktywnosc.get(komentarz.getAuthor());
+                                if (p.getOwner().getId().equals(komentarz.getAuthor())) {
 
-                                    s.dodajKomentarz(
-                                            (komentowalJuz
-                                                ? kolejnyKomentarz
-                                                : pierwszyKomentarz));
-
-                                    aktywnosc.put(komentarz.getAuthor(), s);
+                                    // Komentarze pod zdjęciem autora nie liczymy
 
                                 } else {
 
-                                    // dodajemy nowy klucz
+                                    // kolejne komentarze liczymy mniej hojnie
 
-                                    aktywnosc.put(
-                                        komentarz.getAuthor(),
-                                        new StatystykaAutora(
-                                            (komentowalJuz 
-                                                ? kolejnyKomentarz
-                                                : pierwszyKomentarz),
-                                            0,
-                                            komentarz.getAuthorName())
-                                    );
-                                }
+                                    boolean komentowalJuz = false;
 
-                            } // komentarz inny niż autora zdjęcia
+                                    for (int j=0; j<komentowaliJuz.size(); j++) {
+                                        if (komentowaliJuz.get(j).equals(komentarz.getAuthor())) {
+                                            komentowalJuz = true;
+                                            break;
+                                        }
+                                    }
 
-                        } // komentarze
+                                    if (!komentowalJuz) {
+                                        komentowaliJuz.add(komentarz.getAuthor());
+                                    }
 
-                    } // w zakresie dat
+                                    if (aktywnosc.containsKey(komentarz.getAuthor())) {
+
+                                        // aktualizujemy klucz
+
+                                        StatystykaAutora s = aktywnosc.get(komentarz.getAuthor());
+
+                                        s.dodajKomentarz(
+                                                (komentowalJuz
+                                                    ? kolejnyKomentarz
+                                                    : pierwszyKomentarz));
+
+                                        aktywnosc.put(komentarz.getAuthor(), s);
+
+                                    } else {
+
+                                        // dodajemy nowy klucz
+
+                                        aktywnosc.put(
+                                            komentarz.getAuthor(),
+                                            new StatystykaAutora(
+                                                (komentowalJuz
+                                                    ? kolejnyKomentarz
+                                                    : pierwszyKomentarz),
+                                                0,
+                                                komentarz.getAuthorName())
+                                        );
+                                    }
+
+                                } // komentarz inny niż autora zdjęcia
+
+                            } // komentarze
+
+                        } // w zakresie dat
+
+                        /*
+                         * Optymalizacja, zdjęć za datą końcową nie analizujemy
+                         */
+                        if (p.getDateAdded().before(kgui.dajDataOd())) {
+
+                            /*
+                             * Nie załadujemy kolejnej strony zdjęć
+                             */
+                            ladujKolejnaStrone = false;
+
+                            /*
+                             * Nie analizujemy kolejnego zdjęcia bieżącej strony
+                             */
+                            break;
+
+                        }
+
+                    } // wszystkie zdjęcia dane strony
 
                     /*
-                     * Optymalizacja, zdjęć za datą końcową nie analizujemy
+                     * Następnym razem chcemy ładować kolejną stronę
                      */
-                    if (p.getDateAdded().before(kgui.dajDataOd())) {
-                        break;
-                    }
+                    strona++;
 
-                } // wszystkie zdjęcia w puli
+                } // kolejna strona puli
 
                 /*
                  * Pasek ustawiony do końca
                  */
                 kgui.ustawPostep(100);
+                kgui.ustawPostepStr("OK");
+
             }
 
             /*
