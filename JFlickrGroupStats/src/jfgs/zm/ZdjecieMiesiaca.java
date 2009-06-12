@@ -109,6 +109,14 @@ public class ZdjecieMiesiaca implements ILogika {
                 dw.drukujSeparator();
 
                 dw.drukujLinie(
+                    "Jak co miesiąc zapraszam do głosowania na zdjęcie " +
+                    "miesiąca. Poprzednie głosowania można zobaczyć w <a href" +
+                    "=\"http://www.flickr.com/search/groups/?q=Podsumowanie" +
+                    "&m=discuss&w=71956997%40N00&s=act\">archiwum grupy</a>.");
+
+                dw.drukujSeparator();
+
+                dw.drukujLinie(
                     "Grupa: "
                     + kgui.getNazwaGrupy());
 
@@ -541,7 +549,7 @@ public class ZdjecieMiesiaca implements ILogika {
                     "zawiera odnośnik do zdjęcia wraz z jego miniaturą.");
                 dw.drukujLinie("");
 
-                dw.drukujLinie(kodhtml.toString());
+                dw.drukujLinie("<s>" + kodhtml.toString() + "</s>");
 
             }
 
