@@ -85,7 +85,6 @@ public class DaneWyjsciowe {
             otworzPlik();
         }
         out.write(s);
-        out.flush();
     }
     
     /**

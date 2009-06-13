@@ -12,7 +12,7 @@ package jfgs.zm;
  */
 public class StatystykaAutora implements Comparable<StatystykaAutora> {
 
-    private String nazwaUzytkownika;
+    private final String nazwaUzytkownika;
     private double dodanychZdjec;
     private double dodanychKomentarzy;
     
