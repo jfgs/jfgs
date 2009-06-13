@@ -22,6 +22,16 @@ import jfgs.narzedzia.PogromcaLogiki;
  */
 public class StatsFrame extends javax.swing.JFrame implements IStats {
 
+    /**
+     * @FIXME Stała dla grupy Szczere Komentarze, na szybko
+     */
+    private final String SKid = "71956997@N00";
+
+    /**
+     * @FIXME Stała dla grupy Polacy fotografujący (1/1) , na szybko
+     */
+    private final String PFid = "43929664@N00";
+
     private KontrolerGUI kgui;
     
     /**
@@ -111,7 +121,9 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         }
         
         ustawDateDzisiejsza();
-        
+
+        groupIdField.setText(SKid);
+
         akcjaZmianaWartosciIdGrupy();
         
     }
@@ -148,6 +160,9 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenu2 = new javax.swing.JMenu();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         rokOd = new javax.swing.JTextField();
@@ -174,6 +189,15 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         jmDzis = new javax.swing.JMenuItem();
         jmDodaj = new javax.swing.JMenuItem();
         jmOdejmij = new javax.swing.JMenuItem();
+        jmUlubione = new javax.swing.JMenu();
+        jmSK = new javax.swing.JMenuItem();
+        jmPf = new javax.swing.JMenuItem();
+
+        jMenu1.setText("File");
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Edit");
+        jMenuBar1.add(jMenu2);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("JFlickrGroupStats");
@@ -214,7 +238,6 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
 
         jLabel5.setText("ID grupy:");
 
-        groupIdField.setText("71956997@N00");
         groupIdField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 groupIdFieldActionPerformed(evt);
@@ -288,6 +311,27 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         jmEdytuj.add(jmOdejmij);
 
         jMenu.add(jmEdytuj);
+
+        jmUlubione.setMnemonic('U');
+        jmUlubione.setText("Ulubione");
+
+        jmSK.setText("Szczere Komentarze");
+        jmSK.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmSKActionPerformed(evt);
+            }
+        });
+        jmUlubione.add(jmSK);
+
+        jmPf.setText("Polacy fotografujący (1/1) ");
+        jmPf.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmPfActionPerformed(evt);
+            }
+        });
+        jmUlubione.add(jmPf);
+
+        jMenu.add(jmUlubione);
 
         setJMenuBar(jMenu);
 
@@ -396,6 +440,16 @@ private void jmDzisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:
 private void jmGenerujActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmGenerujActionPerformed
     akcjaGeneruj();
 }//GEN-LAST:event_jmGenerujActionPerformed
+
+private void jmSKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmSKActionPerformed
+    groupIdField.setText(SKid);
+    akcjaZmianaWartosciIdGrupy();
+}//GEN-LAST:event_jmSKActionPerformed
+
+private void jmPfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmPfActionPerformed
+    groupIdField.setText(PFid);
+    akcjaZmianaWartosciIdGrupy();
+}//GEN-LAST:event_jmPfActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel authLabel;
@@ -410,13 +464,19 @@ private void jmGenerujActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JMenuBar jMenu;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JMenuItem jmDodaj;
     private javax.swing.JMenuItem jmDzis;
     private javax.swing.JMenu jmEdytuj;
     private javax.swing.JMenuItem jmGeneruj;
     private javax.swing.JMenuItem jmOdejmij;
+    private javax.swing.JMenuItem jmPf;
     private javax.swing.JMenu jmPlik;
+    private javax.swing.JMenuItem jmSK;
+    private javax.swing.JMenu jmUlubione;
     private javax.swing.JMenuItem jmZakoncz;
     private javax.swing.JComboBox miesiacDo;
     private javax.swing.JComboBox miesiacOd;
