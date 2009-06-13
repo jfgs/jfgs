@@ -41,20 +41,11 @@ public class PodgladFrame extends javax.swing.JFrame {
     private void wgrajPlik(String path) throws IOException {
 
         File f = new File(path);
-        FileReader fr = new FileReader(f);
-        BufferedReader bf = new BufferedReader(fr);
+        FileReader fr = new FileReader(f);        
         
         info.setText(f.getCanonicalPath());
 
-        StringBuilder sb = new StringBuilder();
-        String linia = "";
-        while ((linia = bf.readLine()) != null) {
-            sb.append(linia);
-            sb.append(System.getProperty("line.separator"));
-        }
-        bf.close();
-
-        podglad.setText(sb.toString());
+        podglad.read(fr, f.getCanonicalFile());
 
     }
 

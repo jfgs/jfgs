@@ -13,6 +13,7 @@ import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import javax.swing.JOptionPane;
 import jfgs.gui.PodgladFrame;
 
 /**
@@ -149,7 +150,12 @@ public class DaneWyjsciowe {
     public void pokazOkno() {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new PodgladFrame(Constants.output).setVisible(true);
+                try {
+                    new PodgladFrame(Constants.output).setVisible(true);
+                } catch(Exception e) {
+                    JOptionPane.showMessageDialog(null, e.getMessage());
+                    e.printStackTrace();
+                }
             }
         });
     }
