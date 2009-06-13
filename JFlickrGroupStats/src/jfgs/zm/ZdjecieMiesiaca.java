@@ -143,7 +143,7 @@ public class ZdjecieMiesiaca implements ILogika {
                 /*
                  * Liczba zdjęć na stronie
                  */
-                final int zdjecNaStrone = 30;
+                final int zdjecNaStrone = 250;
 
                 /*
                  * Numer strony zdjęć w puli
@@ -226,8 +226,8 @@ public class ZdjecieMiesiaca implements ILogika {
                                 (int) Math.round(
                                     (double) numerZdjeciaWPuli
                                         / (double) (liczbaZaladowanychWIteratorze 
-                                            // mnożymy aby nigdy nie dojść zbyt blisko końca
-                                            * 1.1)
+                                            // dodajemy aby nigdy nie dojść zbyt blisko końca
+                                            + 25)
                                         * 100));
 
                             kgui.ustawPostepStr(
