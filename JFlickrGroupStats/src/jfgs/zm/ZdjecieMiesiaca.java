@@ -5,6 +5,7 @@
 
 package jfgs.zm;
 
+import com.aetrion.flickr.Flickr;
 import jfgs.narzedzia.DaneWyjsciowe;
 import com.aetrion.flickr.groups.pools.PoolsInterface;
 import com.aetrion.flickr.photos.Extras;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import com.aetrion.flickr.photos.comments.Comment;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
@@ -98,8 +100,16 @@ public class ZdjecieMiesiaca implements ILogika {
          * Kod html do głosowania
          */
         StringBuffer kodhtml = new StringBuffer("");
-
+       
         try {
+
+            /*
+             * Główne stałe algorytmu
+             */
+            final Date dataOd = kgui.dajDataOd();
+            final Date dataDo = kgui.dajDataDo();
+            final String groupID = kgui.getGroupId();
+            final Flickr f = kgui.getFlickr();
 
             /*
              * Nagłówek
@@ -122,9 +132,9 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 dw.drukujLinie(
                     "Zdjęcia dodane po "
-                    + dw.formatujDate(kgui.dajDataOd())
+                    + dw.formatujDate(dataOd)
                     + " i przed "
-                    + dw.formatujDate(kgui.dajDataDo())
+                    + dw.formatujDate(dataDo)
                     + ".");
 
             }
@@ -135,7 +145,7 @@ public class ZdjecieMiesiaca implements ILogika {
             {
                 dw.drukujSeparator("Analizowane zdjęcia");
                 
-                PoolsInterface pi = kgui.getFlickr().getPoolsInterface();
+                PoolsInterface pi = f.getPoolsInterface();
 
                 Set dodatkoweParametry = new HashSet();
                 dodatkoweParametry.add(Extras.VIEWS);
@@ -198,7 +208,7 @@ public class ZdjecieMiesiaca implements ILogika {
                      */
                     PhotoList
                         listaZdjec = pi.getPhotos(
-                            kgui.getGroupId(),
+                            groupID,
                             new String[]{},
                             dodatkoweParametry,
                             zdjecNaStrone,
@@ -222,24 +232,32 @@ public class ZdjecieMiesiaca implements ILogika {
 
                         } else {
                             
-                            kgui.ustawPostep(
-                                (int) Math.round(
-                                    (double) numerZdjeciaWPuli
-                                        / (double) (liczbaZaladowanychWIteratorze 
-                                            // dodajemy aby nigdy nie dojść zbyt blisko końca
-                                            + 25)
-                                        * 100));
+                            /*
+                             * Optymalizacja, ustawienie postępu to 1% całej operacji
+                             * wystarczy jak wywołamy ją raz na dwadzieścia razy
+                             */
+                            if (numerZdjeciaWPuli%20 == 1) {
 
-                            kgui.ustawPostepStr(
-                                "Strona " +
-                                strona +
-                                ", zdjęcie " +
-                                numerZdjeciaWPuli +
-                                "/" +
-                                liczbaZaladowanychWIteratorze +
-                                " (" +
-                                liczbaWszystkichZdjecPuli +
-                                ")");
+                                kgui.ustawPostep(
+                                    (int) Math.round(
+                                        (double) numerZdjeciaWPuli
+                                            / (double) (liczbaZaladowanychWIteratorze
+                                                // dodajemy aby nigdy nie dojść zbyt blisko końca
+                                                + 5)
+                                            * 100));
+
+                                kgui.ustawPostepStr(
+                                    "Strona " +
+                                    strona +
+                                    ", zdjęcie " +
+                                    numerZdjeciaWPuli +
+                                    "/" +
+                                    liczbaZaladowanychWIteratorze +
+                                    " (" +
+                                    liczbaWszystkichZdjecPuli +
+                                    ")");
+
+                            }
                             
                         }
 
@@ -251,8 +269,8 @@ public class ZdjecieMiesiaca implements ILogika {
                         /*
                          * Warunek na kryteria wyboru zdjęć
                          */
-                        if (!p.getDateAdded().after(kgui.dajDataOd())
-                                || !p.getDateAdded().before(kgui.dajDataDo()))
+                        if (!p.getDateAdded().after(dataOd)
+                            || !p.getDateAdded().before(dataDo))
                         {
 
                             // zdjęcie poza zakresem badanych dat
@@ -280,7 +298,7 @@ public class ZdjecieMiesiaca implements ILogika {
                                     new StatystykaAutora(0, 1, p.getOwner().getUsername()));
                             }
 
-                            CommentsInterface ci = kgui.getFlickr().getCommentsInterface();
+                            CommentsInterface ci = f.getCommentsInterface();
                             Collection komentarze = ci.getList(p.getId());
                             Iterator ic = komentarze.iterator();
 
@@ -381,7 +399,7 @@ public class ZdjecieMiesiaca implements ILogika {
                         /*
                          * Optymalizacja, zdjęć za datą końcową nie analizujemy
                          */
-                        if (p.getDateAdded().before(kgui.dajDataOd())) {
+                        if (p.getDateAdded().before(dataOd)) {
 
                             /*
                              * Nie załadujemy kolejnej strony zdjęć
