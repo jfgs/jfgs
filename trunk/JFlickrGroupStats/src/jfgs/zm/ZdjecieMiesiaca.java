@@ -401,6 +401,97 @@ public class ZdjecieMiesiaca implements ILogika {
     }
 
     /**
+     * Liczy komentarze zdjęcia, aktualizuje aktywność autorów o liczbę komentarzy
+     * 
+     * @param photoId
+     * @param ownerId
+     * @param f
+     * @param autorzy
+     * @param aktywnosc
+     * @return
+     * @throws com.aetrion.flickr.FlickrException
+     * @throws java.io.IOException
+     * @throws org.xml.sax.SAXException
+     */
+    private int policzKomentarzeZdjecia(
+        final String photoId,
+        final String ownerId,
+        final Flickr f,
+        final HashMap<String, String> autorzy,
+        HashMap<String, StatystykaAutora> aktywnosc
+    ) throws FlickrException, IOException, SAXException
+    {
+
+        CommentsInterface ci = f.getCommentsInterface();
+        Collection komentarze = ci.getList(photoId);
+        Iterator ic = komentarze.iterator();
+
+        // musimy zapamiętać kto już komentował to zdjęcie
+        HashMap<String, String>
+            komentowaliJuz = new HashMap<String, String>();
+
+        /*
+         * Zliczanie komentarzy autora
+         */
+        while (ic.hasNext()) {
+
+            Comment komentarz = (Comment) ic.next();
+
+            if (ownerId.equals(komentarz.getAuthor())) {
+
+                // Komentarze pod zdjęciem autora nie liczymy
+
+            } else {
+
+                if (!autorzy.containsKey(komentarz.getAuthor())) {
+
+                    /*
+                     * Komentarz napisany przez użytkownika nie
+                     * posiadającego zdjęcia w interesującym nas okresie
+                     * więc go pomijamy
+                     */
+                    continue;
+
+                } else {
+
+                    /*
+                     * Kolejne komentarze liczymy mniej hojnie
+                     */
+                    boolean
+                        komentowalJuz = komentowaliJuz.containsKey(
+                            komentarz.getAuthor());
+
+                    /*
+                     * Zapisujemy kto już komentował
+                     */
+                    if (!komentowalJuz) {
+                        komentowaliJuz.put(komentarz.getAuthor(), "");
+                    }
+
+                    /*
+                     * Aktualizujemy klucz, wszystkie klucze dodane
+                     * są już wyżej
+                     */
+                    StatystykaAutora s = aktywnosc.get(komentarz.getAuthor());
+
+                    s.dodajKomentarz(
+                            (komentowalJuz
+                                ? VAL_KOLEJNY_KOMENTARZ
+                                : VAL_PIERWSZY_KOMENTARZ));
+
+                    aktywnosc.put(komentarz.getAuthor(), s);
+
+                } // komentarz spoza grupy autorów zdjęć
+
+            } // komentarz inny niż autora zdjęcia
+
+        } // komentarze
+
+        return komentarze.size();
+
+    }
+
+    /**
      * Dla przekazanej tablicy zdjęć liczy komentarze i drukuje główne zestawienie
      * @param f
      * @param zdjecia
@@ -424,6 +515,8 @@ public class ZdjecieMiesiaca implements ILogika {
          * Główna pętla, analiza zdjęć i wypisanie ich na ekran
          */
         {
+
+            int kz = 0;
 
             /*
              * Główna pętla po wszystkich zdjęciach
@@ -450,10 +543,6 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 }
 
-                CommentsInterface ci = f.getCommentsInterface();
-                Collection komentarze = ci.getList(zdjecia[noZdjecia].getId());
-                Iterator ic = komentarze.iterator();
-
                 kodhtml.append(
                     dw.formatujLiczbe(noZdjecia)
                     + ": &lt;a href=&quot;"
@@ -463,6 +552,14 @@ public class ZdjecieMiesiaca implements ILogika {
                     + "&quot;&gt;&lt;/a&gt;"
                     + "\n"
                 );
+
+                kz =
+                    policzKomentarzeZdjecia(
+                        zdjecia[noZdjecia].getId(),
+                        zdjecia[noZdjecia].getOwner().getId(),
+                        f,
+                        autorzy,
+                        aktywnosc);
 
                 dw.drukujLinie(
                     dw.formatujLiczbe(noZdjecia)
@@ -475,74 +572,13 @@ public class ZdjecieMiesiaca implements ILogika {
                     + " by "
                     + zdjecia[noZdjecia].getOwner().getUsername()
                     + " ("
-                    + (komentarze.size() == 0
-                        ? "<b>" + komentarze.size() + "</b>"
-                        : "" + komentarze.size())
+                    + (kz == 0
+                        ? "<b>" + kz + "</b>"
+                        : "" + kz)
                     + ")"
                     + ", "
                     + dw.formatujDate(zdjecia[noZdjecia].getDateAdded())
                 );
-
-                // musimy zapamiętać kto już komentował to zdjęcie
-                HashMap<String, String>
-                    komentowaliJuz = new HashMap<String, String>();
-
-                /*
-                 * Zliczanie komentarzy autora
-                 */
-                while (ic.hasNext()) {
-
-                    Comment komentarz = (Comment) ic.next();
-
-                    if (zdjecia[noZdjecia].getOwner().getId().equals(komentarz.getAuthor())) {
-
-                        // Komentarze pod zdjęciem autora nie liczymy
-
-                    } else {
-
-                        if (!autorzy.containsKey(komentarz.getAuthor())) {
-
-                            /*
-                             * Komentarz napisany przez użytkownika nie
-                             * posiadającego zdjęcia w interesującym nas okresie
-                             * więc go pomijamy
-                             */
-                            continue;
-
-                        } else {
-
-                            /*
-                             * Kolejne komentarze liczymy mniej hojnie
-                             */
-                            boolean
-                                komentowalJuz = komentowaliJuz.containsKey(
-                                    komentarz.getAuthor());
-
-                            /*
-                             * Zapisujemy kto już komentował
-                             */
-                            if (!komentowalJuz) {
-                                komentowaliJuz.put(komentarz.getAuthor(), "");
-                            }
-
-                            /*
-                             * Aktualizujemy klucz, wszystkie klucze dodane
-                             * są już wyżej
-                             */
-                            StatystykaAutora s = aktywnosc.get(komentarz.getAuthor());
-
-                            s.dodajKomentarz(
-                                    (komentowalJuz
-                                        ? VAL_KOLEJNY_KOMENTARZ
-                                        : VAL_PIERWSZY_KOMENTARZ));
-
-                            aktywnosc.put(komentarz.getAuthor(), s);
-
-                        } // komentarz spoza grupy autorów zdjęć
-
-                    } // komentarz inny niż autora zdjęcia
-
-                } // komentarze
 
             } // wszystkie wybrane zdjęcia
 
