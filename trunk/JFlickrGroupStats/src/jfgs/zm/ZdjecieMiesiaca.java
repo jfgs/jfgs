@@ -86,6 +86,7 @@ public class ZdjecieMiesiaca implements ILogika {
     
     private KontrolerGUI kgui;
     private DaneWyjsciowe dw;
+    private CommentsInterface ci;
     
 
 
@@ -416,14 +417,22 @@ public class ZdjecieMiesiaca implements ILogika {
     private int policzKomentarzeZdjecia(
         final String photoId,
         final String ownerId,
-        final Flickr f,
+        final CommentsInterface ci,
         final HashMap<String, String> autorzy,
         HashMap<String, StatystykaAutora> aktywnosc
     ) throws FlickrException, IOException, SAXException
     {
-
-        CommentsInterface ci = f.getCommentsInterface();
+        
         Collection komentarze = ci.getList(photoId);
+
+        /*
+         * Optymalizacja, tam dalej nic się nie dzieje jak nie
+         * ma komentarzy
+         */
+        if (komentarze.size() == 0) {
+            return 0;
+        }
+
         Iterator ic = komentarze.iterator();
 
         // musimy zapamiętać kto już komentował to zdjęcie
@@ -518,6 +527,8 @@ public class ZdjecieMiesiaca implements ILogika {
 
             int kz = 0;
 
+            ci = f.getCommentsInterface();
+
             /*
              * Główna pętla po wszystkich zdjęciach
              */
@@ -557,7 +568,7 @@ public class ZdjecieMiesiaca implements ILogika {
                     policzKomentarzeZdjecia(
                         zdjecia[noZdjecia].getId(),
                         zdjecia[noZdjecia].getOwner().getId(),
-                        f,
+                        ci,
                         autorzy,
                         aktywnosc);
 
