@@ -529,6 +529,8 @@ public class ZdjecieMiesiaca implements ILogika {
 
             ci = f.getCommentsInterface();
 
+            kgui.ustawPostepMax(zdjecia.length - 1);
+
             /*
              * Główna pętla po wszystkich zdjęciach
              */
@@ -540,17 +542,13 @@ public class ZdjecieMiesiaca implements ILogika {
                  */
                 if (noZdjecia%5 == 1) {
 
-                    kgui.ustawPostep(
-                        (int) Math.round(
-                            (double) noZdjecia
-                                / (double) zdjecia.length
-                                * 100));
+                    kgui.ustawPostep(noZdjecia);
 
                     kgui.ustawPostepStr(
                         "Zdjęcie " +
                         noZdjecia +
                         "/" +
-                        zdjecia.length);
+                        (zdjecia.length - 1));
 
                 }
 
@@ -596,7 +594,8 @@ public class ZdjecieMiesiaca implements ILogika {
             /*
              * Pasek ustawiony do końca
              */
-            kgui.ustawPostep(100);
+            kgui.ustawPostepMax(1);
+            kgui.ustawPostep(1);
             kgui.ustawPostepStr("OK");
 
         }
