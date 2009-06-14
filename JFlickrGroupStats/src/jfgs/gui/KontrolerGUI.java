@@ -73,7 +73,15 @@ public class KontrolerGUI {
     {
         autoryzer.autoryzuj(this);
     }
-    
+
+    /**
+     * Wartość maksymalna dla paska postępu
+     * @param wartoscMaksymalna
+     */
+    public void ustawPostepMax(int wartoscMaksymalna) {
+        pasekPostepu.setMaximum(wartoscMaksymalna);
+    }
+
     /**
      * Zmiana wartości dla paska postępu
      * @param postep
