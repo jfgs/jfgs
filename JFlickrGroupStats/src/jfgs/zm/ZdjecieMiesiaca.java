@@ -27,6 +27,7 @@ import java.util.Set;
 import jfgs.gui.KontrolerGUI;
 import jfgs.narzedzia.ILogika;
 import jfgs.narzedzia.IPanelKonfiguracyjny;
+import jfgs.narzedzia.PhotoComparatorWgAutora;
 import jfgs.narzedzia.WykresSlupkowy;
 import org.xml.sax.SAXException;
 
@@ -93,8 +94,6 @@ public class ZdjecieMiesiaca implements ILogika {
     private KontrolerGUI kgui;
     private DaneWyjsciowe dw;
     private CommentsInterface ci;
-    
-
 
     public ZdjecieMiesiaca() { }
 
@@ -300,37 +299,6 @@ public class ZdjecieMiesiaca implements ILogika {
         zal.toArray(z);
 
         return z;
-
-    }
-
-    /**
-     * Sortuje tablicę zdjęć wg autora zdjęcia
-     *
-     * @param zdjecia
-     * @return
-     */
-    private Photo[] sortujZdjeciaWgAutora(Photo[] zdjecia) {
-
-        /*
-         * Sortowanie zdjęć wg autora
-         */
-        {
-            Photo tmp = null;
-            for(int i=0; i<zdjecia.length; i++) {
-                for(int j=i; j<zdjecia.length; j++) {
-
-                    if (zdjecia[i].getOwner().getId().compareTo(
-                            zdjecia[j].getOwner().getId()) < 0)
-                    {
-                        tmp = zdjecia[i];
-                        zdjecia[i] = zdjecia[j];
-                        zdjecia[j] = tmp;
-                    }
-                }
-            }
-        }
-
-        return zdjecia;
 
     }
 
@@ -940,12 +908,22 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 zdjecia = dajTabliceZdjec(f, groupID, dataOd, dataDo);
 
-                zdjecia = sortujZdjeciaWgAutora(zdjecia);
+                /*
+                 * Sortowanie wg autora
+                 */
+                {
+
+                    final PhotoComparatorWgAutora 
+                        pcwa = new PhotoComparatorWgAutora();
+
+                    Arrays.sort(zdjecia, pcwa);
+
+                }
 
                 /*
                  * Tablica unikalnych ID autorów
                  */
-                HashMap<String, String> 
+                HashMap<String, String>
                     autorzy =
                         dajAutorow(zdjecia, aktywnosc);
 
