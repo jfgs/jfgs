@@ -13,6 +13,8 @@ package jfgs.narzedzia;
 public class Constants {
 
     public static final String version = "v1.3";
+    public static final String name = "JFlickrGroupStats";
+    public static final String title = name + " " + version;
 
     public static final String apiKey = "669b6ffa41c6994677c3f20a02d1db59";
     public static final String sharedSecret = "5c04af7e59798cc6";
