@@ -7,6 +7,7 @@ package jfgs.zm;
 
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.FlickrException;
+import javax.swing.JPanel;
 import jfgs.narzedzia.DaneWyjsciowe;
 import com.aetrion.flickr.groups.pools.PoolsInterface;
 import com.aetrion.flickr.photos.Extras;
@@ -25,6 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 import jfgs.gui.KontrolerGUI;
 import jfgs.narzedzia.ILogika;
+import jfgs.narzedzia.IPanelKonfiguracyjny;
 import jfgs.narzedzia.WykresSlupkowy;
 import org.xml.sax.SAXException;
 
@@ -41,12 +43,16 @@ public class ZdjecieMiesiaca implements ILogika {
      * Czy po liście zdjęć dodać podsumowanie zbiorcze: użytkownik, liczba
      * komentarzy i bilans komentarze do zdjęć     
      */
-    private static final boolean dodajPodsumowanieZbiorcze = true;
+    private boolean dodajPodsumowanieZbiorcze = false;
+
+    private boolean wykresSlupkowy = false;
+    private boolean wykresLista = false;
+    private boolean dodajKodHTML = false;
     
     /**
      * Czy generujemy kostkę z miniaturkami zdjęć
      */
-    private static final boolean dodajKostkeMiniaturek = true;
+    private boolean dodajKostkeMiniaturek = false;
     
     /**
      * Liczba miniatur w wierszu, trzeba zmieścić się w szerokości pola
@@ -58,7 +64,7 @@ public class ZdjecieMiesiaca implements ILogika {
      * Czy generujemy zestawienie zdjęć najbardziej oglądanych
      * @see liczbaZestawieniaNajbardziejPopularnych
      */
-    private static final boolean dodajPodsumowaniePopularnosci = true;
+    private boolean dodajPodsumowaniePopularnosci = false;
 
     /**
      * Liczba zestawienia zdjęć najbardziej popularnych
@@ -654,7 +660,7 @@ public class ZdjecieMiesiaca implements ILogika {
             aktywnosc.values().toArray(sat);
             Arrays.sort(sat);
 
-            {
+            if (wykresSlupkowy) {
                 WykresSlupkowy ws = new WykresSlupkowy();
 
                 for (StatystykaAutora sa : sat) {
@@ -674,6 +680,30 @@ public class ZdjecieMiesiaca implements ILogika {
                 }
 
                 dw.drukuj(ws.get());
+
+            } else if(wykresLista) {
+
+                final String separator = ";";
+
+                dw.drukujLinie(
+                    "Nazwa" + separator +
+                    "Liczba zdjęć" + separator +
+                    "Liczba komentarzy" + separator +
+                    "Wartość");
+
+                for (StatystykaAutora sa : sat) {
+
+                    dw.drukujLinie(
+                        sa.dajNazwe() + separator +
+                        sa.dajLiczbeZdjec() + separator +
+                        sa.dajLiczbeKomentarzy() + separator +
+                        sa.dajWartosc());
+
+                }
+
+            } else {
+
+                throw new RuntimeException("niy!");
 
             }
 
@@ -822,6 +852,10 @@ public class ZdjecieMiesiaca implements ILogika {
                 "zdjęciach grupy SK z tagiem <i>Zdjęcie miesiąca grupy " +
                 "Szczere komentarze</i></a>.");
 
+        }
+
+        if (dodajKodHTML) {
+
             dw.drukujSeparator("Kod HTML");
 
             dw.drukujLinie(
@@ -951,7 +985,28 @@ public class ZdjecieMiesiaca implements ILogika {
     }
 
     public void podlaczGUI(KontrolerGUI kontroler) {
+        
         this.kgui = kontroler;
+
+        if (kontroler.getPanelKonfiguracyjny() != null) {
+
+            if (kontroler.getPanelKonfiguracyjny() instanceof PanelKonfiguracji) {
+
+                PanelKonfiguracji pk = (PanelKonfiguracji) kontroler.getPanelKonfiguracyjny();
+
+                dodajKostkeMiniaturek = pk.dajKostkeMiniatur();
+                dodajPodsumowaniePopularnosci = pk.dajPodsumowaniePopularnosci();
+                dodajPodsumowanieZbiorcze = pk.dajPodsumowanieZbiorcze();
+                dodajKodHTML = pk.dajKodHTML();
+                wykresLista = pk.dajWykresLista();
+                wykresSlupkowy = pk.dajWykresSlupkowy();
+
+            } else {
+                throw new RuntimeException("Zły panel konfiguracyjny!");
+            }
+
+        }
+
     }
 
     /**
@@ -966,5 +1021,9 @@ public class ZdjecieMiesiaca implements ILogika {
         }
         return n;
     }
-        
+
+    public IPanelKonfiguracyjny dajPanelKonfiguracyjny() {
+        return new PanelKonfiguracji();
+    }
+
 }

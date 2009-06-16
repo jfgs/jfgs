@@ -15,10 +15,12 @@ import java.text.ParseException;
 import java.util.Date;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.xml.parsers.ParserConfigurationException;
 import jfgs.narzedzia.Autoryzer;
+import jfgs.narzedzia.IPanelKonfiguracyjny;
 import org.xml.sax.SAXException;
 
 /**
@@ -33,20 +35,33 @@ public class KontrolerGUI {
     private Autoryzer autoryzer;
     private JLabel authLabel;
     private JTextField groupIdField;
+    private IPanelKonfiguracyjny panelKonfiguracyjny;
     
-    public KontrolerGUI(JProgressBar pasekPostepu, IStats stats, 
-        JLabel authLabel, JTextField groupIdField) 
-        throws ParserConfigurationException 
+    public KontrolerGUI(
+        JProgressBar pasekPostepu,
+        IStats stats,
+        JLabel authLabel,
+        JTextField groupIdField
+    ) throws ParserConfigurationException
     {
         this.pasekPostepu = pasekPostepu;
         this.stats = stats;
         this.authLabel = authLabel;
         this.groupIdField = groupIdField;        
         this.autoryzer = Autoryzer.get();
+        this.panelKonfiguracyjny = null;
     }
     
     public Flickr getFlickr() throws ParserConfigurationException {
         return autoryzer.getFlickr();
+    }
+
+    public void setPanelKoniguracyjny(IPanelKonfiguracyjny panel) {
+        this.panelKonfiguracyjny = panel;
+    }
+
+    public IPanelKonfiguracyjny getPanelKonfiguracyjny() {
+        return panelKonfiguracyjny;
     }
     
     /**

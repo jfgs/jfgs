@@ -6,6 +6,7 @@
 
 package jfgs.gui;
 
+import java.awt.BorderLayout;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
@@ -13,7 +14,9 @@ import java.util.Date;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
+import jfgs.narzedzia.IPanelKonfiguracyjny;
 import jfgs.narzedzia.PogromcaLogiki;
 
 /**
@@ -33,7 +36,7 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
     private final String PFid = "43929664@N00";
 
     private KontrolerGUI kgui;
-    
+
     /**
      * Akceptuje tylko niepustą wartość będącą liczbą całkowitą dodatnią
      */
@@ -82,6 +85,10 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
      * @param czyDoEdycji
      */
     private void stanKomponentów(boolean czyDoEdycji) {        
+        
+        /*
+         * Pierwsza zakładka
+         */
         miesiacOd.setEnabled(czyDoEdycji);
         miesiacDo.setEnabled(czyDoEdycji);
         rokOd.setEditable(czyDoEdycji);
@@ -89,10 +96,24 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         groupIdField.setEditable(czyDoEdycji);
         generuj.setEnabled(czyDoEdycji);
         rodzajLogiki.setEnabled(czyDoEdycji);
+
+        /*
+         * Druga zakładka
+         */
+        if (kgui.getPanelKonfiguracyjny() != null) {
+            kgui.getPanelKonfiguracyjny().stanKomponentow(czyDoEdycji);
+        }
+
+        /*
+         * Menu
+         */
         jmDodaj.setEnabled(czyDoEdycji);
         jmOdejmij.setEnabled(czyDoEdycji);
         jmDzis.setEnabled(czyDoEdycji);
         jmGeneruj.setEnabled(czyDoEdycji);
+        jmSK.setEnabled(czyDoEdycji);
+        jmPf.setEnabled(czyDoEdycji);
+        
     }
     
     /** Creates new form StatsFrame */
@@ -125,6 +146,8 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         groupIdField.setText(SKid);
 
         akcjaZmianaWartosciIdGrupy();
+
+        przeladujPanelKonfiguracji();
         
     }
 
@@ -151,6 +174,28 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
 
     }
 
+    private void przeladujPanelKonfiguracji() {
+        
+        panelKonfiguracja.removeAll();
+        panelKonfiguracja.setLayout(new BorderLayout());
+
+        IPanelKonfiguracyjny pk =
+            PogromcaLogiki.dajPanelKonfiguracyjny(
+                rodzajLogiki.getSelectedItem());
+
+        if (pk != null) {
+            panelKonfiguracja.add((JPanel) pk.getPanel(), BorderLayout.CENTER);
+            panelKonfiguracja.setEnabled(true);
+        } else {
+            panelKonfiguracja.setEnabled(false);
+        }
+
+        kgui.setPanelKoniguracyjny(pk);
+
+        panelKonfiguracja.revalidate();
+
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -163,9 +208,11 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        panelKryteria = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         rokOd = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
         rokDo = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -174,12 +221,13 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         postepOperacji = new javax.swing.JProgressBar();
         generuj = new javax.swing.JButton();
         authLabel = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
         groupIdField = new javax.swing.JTextField();
         groupNameField = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
         rodzajLogiki = new javax.swing.JComboBox();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
+        panelKonfiguracja = new javax.swing.JPanel();
         jMenu = new javax.swing.JMenuBar();
         jmPlik = new javax.swing.JMenu();
         jmGeneruj = new javax.swing.JMenuItem();
@@ -205,10 +253,10 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
 
         jLabel1.setText("Od:");
 
-        jLabel2.setText("Do:");
-
         rokOd.setText("2008");
         rokOd.setInputVerifier(new TylkoPoprawnyRok());
+
+        jLabel2.setText("Do:");
 
         rokDo.setText("2008");
         rokDo.setInputVerifier(new TylkoPoprawnyRok());
@@ -236,8 +284,6 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
 
         authLabel.setText("...");
 
-        jLabel5.setText("ID grupy:");
-
         groupIdField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 groupIdFieldActionPerformed(evt);
@@ -246,11 +292,111 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
 
         groupNameField.setEditable(false);
 
+        rodzajLogiki.setModel(PogromcaLogiki.dajModelDlaRodzaju());
+        rodzajLogiki.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rodzajLogikiActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("ID grupy:");
+
         jLabel6.setText("Grupa:");
 
-        rodzajLogiki.setModel(PogromcaLogiki.dajModelDlaRodzaju());
-
         jLabel7.setText("Rodzaj:");
+
+        javax.swing.GroupLayout panelKryteriaLayout = new javax.swing.GroupLayout(panelKryteria);
+        panelKryteria.setLayout(panelKryteriaLayout);
+        panelKryteriaLayout.setHorizontalGroup(
+            panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelKryteriaLayout.createSequentialGroup()
+                .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelKryteriaLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panelKryteriaLayout.createSequentialGroup()
+                                .addComponent(generuj)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(authLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE))
+                            .addGroup(panelKryteriaLayout.createSequentialGroup()
+                                .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(panelKryteriaLayout.createSequentialGroup()
+                                        .addComponent(jLabel2)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(rokDo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel4))
+                                    .addGroup(panelKryteriaLayout.createSequentialGroup()
+                                        .addComponent(jLabel1)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(rokOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel3)))
+                                .addGap(6, 6, 6)
+                                .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(miesiacDo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(miesiacOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(175, 175, 175)
+                                .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel7)
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel5))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(groupIdField, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
+                                    .addComponent(groupNameField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
+                                    .addComponent(rodzajLogiki, 0, 186, Short.MAX_VALUE)))))
+                    .addGroup(panelKryteriaLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(postepOperacji, javax.swing.GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        panelKryteriaLayout.setVerticalGroup(
+            panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelKryteriaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(rokOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(groupIdField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel3)
+                    .addComponent(miesiacOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(rokDo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(groupNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6)
+                    .addComponent(miesiacDo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(rodzajLogiki, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
+                .addComponent(postepOperacji, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(generuj)
+                    .addComponent(authLabel))
+                .addGap(9, 9, 9))
+        );
+
+        jTabbedPane1.addTab("Kryteria", panelKryteria);
+
+        javax.swing.GroupLayout panelKonfiguracjaLayout = new javax.swing.GroupLayout(panelKonfiguracja);
+        panelKonfiguracja.setLayout(panelKonfiguracjaLayout);
+        panelKonfiguracjaLayout.setHorizontalGroup(
+            panelKonfiguracjaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 605, Short.MAX_VALUE)
+        );
+        panelKonfiguracjaLayout.setVerticalGroup(
+            panelKonfiguracjaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 238, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Konfiguracja", panelKonfiguracja);
 
         jmPlik.setMnemonic('P');
         jmPlik.setText("Plik");
@@ -339,75 +485,11 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(generuj)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(authLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
-                    .addComponent(postepOperacji, javax.swing.GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(rokOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(3, 3, 3)
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(miesiacOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel5))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(rokDo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(3, 3, 3)
-                                .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(miesiacDo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel7)
-                                    .addComponent(jLabel6))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(rodzajLogiki, 0, 222, Short.MAX_VALUE)
-                            .addComponent(groupNameField, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
-                            .addComponent(groupIdField, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE))))
-                .addContainerGap())
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 613, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(rokOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3)
-                    .addComponent(miesiacOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(groupIdField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(rokDo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel4)
-                    .addComponent(miesiacDo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(groupNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(rodzajLogiki, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
-                .addComponent(postepOperacji, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(generuj)
-                    .addComponent(authLabel))
-                .addContainerGap())
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
         );
 
         pack();
@@ -450,6 +532,10 @@ private void jmPfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:ev
     groupIdField.setText(PFid);
     akcjaZmianaWartosciIdGrupy();
 }//GEN-LAST:event_jmPfActionPerformed
+
+private void rodzajLogikiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rodzajLogikiActionPerformed
+    przeladujPanelKonfiguracji();
+}//GEN-LAST:event_rodzajLogikiActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel authLabel;
@@ -468,6 +554,7 @@ private void jmPfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:ev
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JMenuItem jmDodaj;
     private javax.swing.JMenuItem jmDzis;
     private javax.swing.JMenu jmEdytuj;
@@ -480,6 +567,8 @@ private void jmPfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:ev
     private javax.swing.JMenuItem jmZakoncz;
     private javax.swing.JComboBox miesiacDo;
     private javax.swing.JComboBox miesiacOd;
+    private javax.swing.JPanel panelKonfiguracja;
+    private javax.swing.JPanel panelKryteria;
     private javax.swing.JProgressBar postepOperacji;
     private javax.swing.JComboBox rodzajLogiki;
     private javax.swing.JTextField rokDo;

@@ -5,6 +5,7 @@ package jfgs.narzedzia;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JPanel;
 import jfgs.ak.AnalizaKomentarzy;
 import jfgs.gui.KontrolerGUI;
 import jfgs.zm.ZdjecieMiesiaca;
@@ -50,6 +51,23 @@ public class PogromcaLogiki {
         }
 
         wykonaj(logika, kontroler);
+    }
+
+    public static IPanelKonfiguracyjny dajPanelKonfiguracyjny(Object rodzajLogiki) {
+
+        ILogika logika = null;
+
+        if (LOGIKA_ZDJECIA_MIESIACA.equals(rodzajLogiki)) {
+            logika = new ZdjecieMiesiaca();
+        } else if (LOGIKA_ANALIZA_KOMENTARZY.equals(rodzajLogiki)) {
+            logika = new AnalizaKomentarzy();
+        } else {
+            throw new RuntimeException(
+                "Nieznany rodzaj logiki: "+rodzajLogiki+"!");
+        }
+
+        return logika.dajPanelKonfiguracyjny();
+
     }
 
     private static void wykonaj(final ILogika logika, final KontrolerGUI kontroler) {

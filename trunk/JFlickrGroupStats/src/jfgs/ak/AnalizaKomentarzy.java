@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import javax.swing.JPanel;
 import jfgs.gui.KontrolerGUI;
 import jfgs.narzedzia.ILogika;
+import jfgs.narzedzia.IPanelKonfiguracyjny;
 
 /**
  * Odczytanie wydźwięku komentarzy pod zdjęciem
@@ -156,6 +158,10 @@ public class AnalizaKomentarzy implements ILogika {
 
         return ILogika.WYKONANIE_POPRAWNE;
 
+    }
+
+    public IPanelKonfiguracyjny dajPanelKonfiguracyjny() {
+        return null;
     }
 
 }
