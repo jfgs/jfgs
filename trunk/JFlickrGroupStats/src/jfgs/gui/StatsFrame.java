@@ -16,6 +16,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import jfgs.narzedzia.Constants;
 import jfgs.narzedzia.IPanelKonfiguracyjny;
 import jfgs.narzedzia.PogromcaLogiki;
 
@@ -120,7 +121,12 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
     public StatsFrame() {
         
         initComponents();
-        
+
+        setTitle(
+            getTitle()
+            + " "
+            + Constants.version);
+
         try {
             
             kgui = new KontrolerGUI(
