@@ -3,6 +3,7 @@
 
 package jfgs.narzedzia;
 
+import javax.swing.JPanel;
 import jfgs.gui.KontrolerGUI;
 
 /**
@@ -33,5 +34,11 @@ public interface ILogika {
      * @return
      */
     public int wykonajZadanie();
+
+    /**
+     * Zwraca panel konfiguracyjny dla GUI, jeżeli brak null
+     * @return
+     */
+    public IPanelKonfiguracyjny dajPanelKonfiguracyjny();
 
 }
