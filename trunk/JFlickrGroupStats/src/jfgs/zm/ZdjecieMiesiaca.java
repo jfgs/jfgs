@@ -45,8 +45,21 @@ public class ZdjecieMiesiaca implements ILogika {
      */
     private boolean dodajPodsumowanieZbiorcze = false;
 
+    /**
+     * Jako wykres słupkowy
+     * @see dodajPodsumowanieZbiorcze
+     */
     private boolean wykresSlupkowy = false;
+
+    /**
+     * Jako lista
+     * @see dodajPodsumowanieZbiorcze
+     */
     private boolean wykresLista = false;
+
+    /**
+     * Kod HTML dla analizowanych zdjęć
+     */
     private boolean dodajKodHTML = false;
     
     /**
@@ -91,8 +104,7 @@ public class ZdjecieMiesiaca implements ILogika {
     private static final int zdjecNaStrone = 333;
     
     private KontrolerGUI kgui;
-    private DaneWyjsciowe dw;
-    private CommentsInterface ci;
+    private DaneWyjsciowe dw;    
 
     public ZdjecieMiesiaca() { }
 
@@ -311,7 +323,7 @@ public class ZdjecieMiesiaca implements ILogika {
      */
     private HashMap<String, String> dajAutorow(
         final Photo[] zdjecia,
-        HashMap<String, StatystykaAutora> aktywnosc)
+        final HashMap<String, StatystykaAutora> aktywnosc)
     {
 
         HashMap<String, String> autorzy = new HashMap<String, String>();
@@ -392,7 +404,7 @@ public class ZdjecieMiesiaca implements ILogika {
         final String ownerId,
         final CommentsInterface ci,
         final HashMap<String, String> autorzy,
-        HashMap<String, StatystykaAutora> aktywnosc
+        final HashMap<String, StatystykaAutora> aktywnosc
     ) throws FlickrException, IOException, SAXException
     {
         
@@ -487,9 +499,9 @@ public class ZdjecieMiesiaca implements ILogika {
     private void wykonajLiczenieKomentarzy(
         final Flickr f,
         final Photo[] zdjecia,
-        HashMap<String, StatystykaAutora> aktywnosc,
-        HashMap<String, String> autorzy,
-        StringBuffer kodhtml
+        final HashMap<String, StatystykaAutora> aktywnosc,
+        final HashMap<String, String> autorzy,
+        final StringBuffer kodhtml
     ) throws FlickrException, IOException, SAXException 
     {
 
@@ -500,7 +512,7 @@ public class ZdjecieMiesiaca implements ILogika {
 
             int kz = 0;
 
-            ci = f.getCommentsInterface();
+            final CommentsInterface ci = f.getCommentsInterface();
 
             kgui.ustawPostepMax(zdjecia.length - 1);
 
@@ -683,7 +695,9 @@ public class ZdjecieMiesiaca implements ILogika {
      *
      * @param zdjecia
      */
-    private void drukujPodsumowaniePopularnosci(final Photo[] zdjecia) {
+    private void drukujPodsumowaniePopularnosci(
+        final Photo[] zdjecia)
+    {
 
         /*
          * Warunek zestawienia TOP wg popularności
@@ -845,20 +859,9 @@ public class ZdjecieMiesiaca implements ILogika {
         dw = new DaneWyjsciowe();
 
         /*
-         * Kolekcja obiektów reprezentujących aktywność użytkownika, kluczem
-         * jest identyfikator użytkownika
-         */
-        HashMap<String, StatystykaAutora> aktywnosc = null;
-
-        /*
-         * Kolekcja zdjęć w zakresie kryteriów
-         */
-        Photo[] zdjecia = null;
-
-        /*
          * Kod html do głosowania
          */
-        StringBuffer kodhtml = new StringBuffer("");
+        final StringBuffer kodhtml = new StringBuffer("");
        
         try {
 
@@ -899,13 +902,21 @@ public class ZdjecieMiesiaca implements ILogika {
             }
 
             /*
+             * Kolekcja obiektów reprezentujących aktywność użytkownika, kluczem
+             * jest identyfikator użytkownika
+             */
+            final HashMap<String, StatystykaAutora>
+                aktywnosc = new HashMap<String, StatystykaAutora>();
+
+            /*
+             * Kolekcja zdjęć w zakresie kryteriów
+             */
+            final Photo[] zdjecia = dajTabliceZdjec(f, groupID, dataOd, dataDo);
+
+            /*
              * Główna pętla, analiza zdjęć i wypisanie ich na ekran
              */
             {
-                
-                aktywnosc = new HashMap<String, StatystykaAutora>();
-
-                zdjecia = dajTabliceZdjec(f, groupID, dataOd, dataDo);
 
                 /*
                  * Sortowanie wg autora
@@ -922,7 +933,7 @@ public class ZdjecieMiesiaca implements ILogika {
                 /*
                  * Tablica unikalnych ID autorów
                  */
-                HashMap<String, String>
+                final HashMap<String, String>
                     autorzy =
                         dajAutorow(zdjecia, aktywnosc);
 
