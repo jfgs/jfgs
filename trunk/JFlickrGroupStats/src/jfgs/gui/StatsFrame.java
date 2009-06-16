@@ -14,6 +14,7 @@ import java.util.Date;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import jfgs.narzedzia.Constants;
@@ -122,10 +123,7 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         
         initComponents();
 
-        setTitle(
-            getTitle()
-            + " "
-            + Constants.version);
+        setTitle(Constants.title);
 
         try {
             
@@ -246,6 +244,8 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         jmUlubione = new javax.swing.JMenu();
         jmSK = new javax.swing.JMenuItem();
         jmPf = new javax.swing.JMenuItem();
+        jmPomoc = new javax.swing.JMenu();
+        jmOProgramie = new javax.swing.JMenuItem();
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
@@ -254,7 +254,6 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         jMenuBar1.add(jMenu2);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("JFlickrGroupStats");
         setResizable(false);
 
         jLabel1.setText("Od:");
@@ -316,45 +315,41 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         panelKryteriaLayout.setHorizontalGroup(
             panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelKryteriaLayout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(panelKryteriaLayout.createSequentialGroup()
-                        .addContainerGap()
+                        .addComponent(generuj)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(authLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE))
+                    .addGroup(panelKryteriaLayout.createSequentialGroup()
                         .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(panelKryteriaLayout.createSequentialGroup()
-                                .addComponent(generuj)
+                                .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(authLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE))
+                                .addComponent(rokDo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel4))
                             .addGroup(panelKryteriaLayout.createSequentialGroup()
-                                .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(panelKryteriaLayout.createSequentialGroup()
-                                        .addComponent(jLabel2)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(rokDo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel4))
-                                    .addGroup(panelKryteriaLayout.createSequentialGroup()
-                                        .addComponent(jLabel1)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(rokOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jLabel3)))
-                                .addGap(6, 6, 6)
-                                .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(miesiacDo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(miesiacOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(175, 175, 175)
-                                .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel7)
-                                    .addComponent(jLabel6)
-                                    .addComponent(jLabel5))
+                                .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(groupIdField, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
-                                    .addComponent(groupNameField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
-                                    .addComponent(rodzajLogiki, 0, 186, Short.MAX_VALUE)))))
-                    .addGroup(panelKryteriaLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(postepOperacji, javax.swing.GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)))
+                                .addComponent(rokOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel3)))
+                        .addGap(6, 6, 6)
+                        .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(miesiacDo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(miesiacOd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(175, 175, 175)
+                        .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel5))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(panelKryteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(groupIdField, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
+                            .addComponent(groupNameField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
+                            .addComponent(rodzajLogiki, 0, 186, Short.MAX_VALUE)))
+                    .addComponent(postepOperacji, javax.swing.GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelKryteriaLayout.setVerticalGroup(
@@ -485,6 +480,20 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
 
         jMenu.add(jmUlubione);
 
+        jmPomoc.setMnemonic('P');
+        jmPomoc.setText("Pomoc");
+
+        jmOProgramie.setMnemonic('O');
+        jmOProgramie.setText("O programie");
+        jmOProgramie.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jmOProgramieActionPerformed(evt);
+            }
+        });
+        jmPomoc.add(jmOProgramie);
+
+        jMenu.add(jmPomoc);
+
         setJMenuBar(jMenu);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -542,6 +551,21 @@ private void jmPfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:ev
 private void rodzajLogikiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rodzajLogikiActionPerformed
     przeladujPanelKonfiguracji();
 }//GEN-LAST:event_rodzajLogikiActionPerformed
+
+private void jmOProgramieActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jmOProgramieActionPerformed
+
+    JOptionPane.showMessageDialog(
+        this,
+        "<html>" +
+            "<p>" + Constants.title + "</p>" +
+            "<p>Licencja: <a href=\"http://www.gnu.org/licenses/gpl.html\">GNU General Public License v3</a></p>" +
+            "<p>Strona domowa: <a href=\"http://code.google.com/p/jfgs/\">code.google.com/p/jfgs</a></p>" +
+        "</html>",
+        "O programie",
+        JOptionPane.INFORMATION_MESSAGE
+    );
+
+}//GEN-LAST:event_jmOProgramieActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel authLabel;
@@ -565,9 +589,11 @@ private void rodzajLogikiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     private javax.swing.JMenuItem jmDzis;
     private javax.swing.JMenu jmEdytuj;
     private javax.swing.JMenuItem jmGeneruj;
+    private javax.swing.JMenuItem jmOProgramie;
     private javax.swing.JMenuItem jmOdejmij;
     private javax.swing.JMenuItem jmPf;
     private javax.swing.JMenu jmPlik;
+    private javax.swing.JMenu jmPomoc;
     private javax.swing.JMenuItem jmSK;
     private javax.swing.JMenu jmUlubione;
     private javax.swing.JMenuItem jmZakoncz;
