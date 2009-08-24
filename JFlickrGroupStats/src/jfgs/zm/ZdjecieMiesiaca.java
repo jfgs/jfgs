@@ -538,7 +538,7 @@ public class ZdjecieMiesiaca implements ILogika {
                 }
 
                 kodhtml.append(
-                    dw.formatujLiczbe(noZdjecia)
+                    dw.formatujLiczbe(noZdjecia + 1)                            // liczymy od jedynki
                     + ": &lt;a href=&quot;"
                     + zdjecia[noZdjecia].getUrl()
                     + "&quot;&gt;&lt;img src=&quot;"
@@ -556,7 +556,7 @@ public class ZdjecieMiesiaca implements ILogika {
                         aktywnosc);
 
                 dw.drukujLinie(
-                    dw.formatujLiczbe(noZdjecia)
+                    dw.formatujLiczbe(noZdjecia + 1)                            // liczymy od jedynki
                     + ": "
                     + "<a href=\""
                     + zdjecia[noZdjecia].getUrl()
