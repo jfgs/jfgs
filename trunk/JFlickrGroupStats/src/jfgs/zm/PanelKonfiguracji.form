@@ -34,8 +34,22 @@
                   <Component id="cbPodsumowaniePopularnosci" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="cbKostkaMiniatur" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="cbKodHTML" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="cbBezKomentarzy" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="lbBezKomentarzy" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="lBezKomentarzy" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="cbBezZdjec" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="lbBezZdjec" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="lBezZdjec" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace pref="138" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -54,7 +68,19 @@
               <Component id="cbKostkaMiniatur" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="cbKodHTML" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="126" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="cbBezKomentarzy" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lbBezKomentarzy" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lBezKomentarzy" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="cbBezZdjec" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lbBezZdjec" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lBezZdjec" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -102,6 +128,60 @@
       <Properties>
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Drukuj kod HTML"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="cbBezKomentarzy">
+      <Properties>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" value="Drukuj brak komentarzy w ci&#x105;gu"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cbBezKomentarzyActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="cbBezZdjec">
+      <Properties>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" value="Drukuj brak zdj&#x119;&#x107; w ci&#x105;gu"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cbBezZdjecActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="lbBezKomentarzy">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="4">
+            <StringItem index="0" value="1"/>
+            <StringItem index="1" value="3"/>
+            <StringItem index="2" value="6"/>
+            <StringItem index="3" value="12"/>
+          </StringArray>
+        </Property>
+        <Property name="selectedIndex" type="int" value="1"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="lbBezZdjec">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="4">
+            <StringItem index="0" value="1"/>
+            <StringItem index="1" value="3"/>
+            <StringItem index="2" value="6"/>
+            <StringItem index="3" value="12"/>
+          </StringArray>
+        </Property>
+        <Property name="selectedIndex" type="int" value="2"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lBezKomentarzy">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="miesi&#x119;cy."/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lBezZdjec">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="miesi&#x119;cy."/>
       </Properties>
     </Component>
   </SubComponents>
