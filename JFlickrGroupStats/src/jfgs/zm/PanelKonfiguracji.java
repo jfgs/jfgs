@@ -41,6 +41,12 @@ public class PanelKonfiguracji extends javax.swing.JPanel implements IPanelKonfi
         rbWykresSlupkowy = new javax.swing.JRadioButton();
         rbLista = new javax.swing.JRadioButton();
         cbKodHTML = new javax.swing.JCheckBox();
+        cbBezKomentarzy = new javax.swing.JCheckBox();
+        cbBezZdjec = new javax.swing.JCheckBox();
+        lbBezKomentarzy = new javax.swing.JComboBox();
+        lbBezZdjec = new javax.swing.JComboBox();
+        lBezKomentarzy = new javax.swing.JLabel();
+        lBezZdjec = new javax.swing.JLabel();
 
         cbPodsumowanieZbiorcze.setSelected(true);
         cbPodsumowanieZbiorcze.setText("Drukuj podsumowanie zbiorcze");
@@ -66,6 +72,32 @@ public class PanelKonfiguracji extends javax.swing.JPanel implements IPanelKonfi
         cbKodHTML.setSelected(true);
         cbKodHTML.setText("Drukuj kod HTML");
 
+        cbBezKomentarzy.setSelected(true);
+        cbBezKomentarzy.setText("Drukuj brak komentarzy w ciągu");
+        cbBezKomentarzy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbBezKomentarzyActionPerformed(evt);
+            }
+        });
+
+        cbBezZdjec.setSelected(true);
+        cbBezZdjec.setText("Drukuj brak zdjęć w ciągu");
+        cbBezZdjec.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbBezZdjecActionPerformed(evt);
+            }
+        });
+
+        lbBezKomentarzy.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "3", "6", "12" }));
+        lbBezKomentarzy.setSelectedIndex(1);
+
+        lbBezZdjec.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "3", "6", "12" }));
+        lbBezZdjec.setSelectedIndex(2);
+
+        lBezKomentarzy.setText("miesięcy.");
+
+        lBezZdjec.setText("miesięcy.");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -81,8 +113,20 @@ public class PanelKonfiguracji extends javax.swing.JPanel implements IPanelKonfi
                             .addComponent(rbWykresSlupkowy)))
                     .addComponent(cbPodsumowaniePopularnosci)
                     .addComponent(cbKostkaMiniatur)
-                    .addComponent(cbKodHTML))
-                .addContainerGap(138, Short.MAX_VALUE))
+                    .addComponent(cbKodHTML)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(cbBezKomentarzy)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lbBezKomentarzy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lBezKomentarzy))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(cbBezZdjec)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lbBezZdjec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lBezZdjec)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -99,7 +143,17 @@ public class PanelKonfiguracji extends javax.swing.JPanel implements IPanelKonfi
                 .addComponent(cbKostkaMiniatur)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbKodHTML)
-                .addContainerGap(126, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cbBezKomentarzy)
+                    .addComponent(lbBezKomentarzy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lBezKomentarzy))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cbBezZdjec)
+                    .addComponent(lbBezZdjec, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lBezZdjec))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -113,6 +167,14 @@ public class PanelKonfiguracji extends javax.swing.JPanel implements IPanelKonfi
             rbWykresSlupkowy.setEnabled(false);
         }
     }//GEN-LAST:event_cbPodsumowanieZbiorczeActionPerformed
+
+    private void cbBezKomentarzyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBezKomentarzyActionPerformed
+        lbBezKomentarzy.setEnabled(cbBezKomentarzy.isSelected());
+    }//GEN-LAST:event_cbBezKomentarzyActionPerformed
+
+    private void cbBezZdjecActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBezZdjecActionPerformed
+        lbBezZdjec.setEnabled(cbBezZdjec.isSelected());
+    }//GEN-LAST:event_cbBezZdjecActionPerformed
 
     public boolean dajPodsumowanieZbiorcze() {
         return cbPodsumowanieZbiorcze.isSelected();
@@ -138,11 +200,47 @@ public class PanelKonfiguracji extends javax.swing.JPanel implements IPanelKonfi
         return rbWykresSlupkowy.isSelected();
     }
 
+    public boolean dajDrukujBezZdjec() {
+        return cbBezZdjec.isSelected();
+    }
+
+    public boolean dajDrukujBezKomentarzy() {
+        return cbBezKomentarzy.isSelected();
+    }
+
+    public Integer dajLiczbeMcBezZdjec() {
+        Integer mc = null;
+        try {
+            mc = Integer.parseInt((String) lbBezZdjec.getSelectedItem());
+        } catch (Exception e) {
+            e.printStackTrace();
+            mc = new Integer(1);
+        }
+        return mc;
+    }
+
+    public Integer dajLiczbeMcBezKomentarzy() {
+        Integer mc = null;
+        try {
+            mc = Integer.parseInt((String) lbBezKomentarzy.getSelectedItem());
+        } catch (Exception e) {
+            e.printStackTrace();
+            mc = new Integer(1);
+        }
+        return mc;
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox cbBezKomentarzy;
+    private javax.swing.JCheckBox cbBezZdjec;
     private javax.swing.JCheckBox cbKodHTML;
     private javax.swing.JCheckBox cbKostkaMiniatur;
     private javax.swing.JCheckBox cbPodsumowaniePopularnosci;
     private javax.swing.JCheckBox cbPodsumowanieZbiorcze;
+    private javax.swing.JLabel lBezKomentarzy;
+    private javax.swing.JLabel lBezZdjec;
+    private javax.swing.JComboBox lbBezKomentarzy;
+    private javax.swing.JComboBox lbBezZdjec;
     private javax.swing.JRadioButton rbLista;
     private javax.swing.JRadioButton rbWykresSlupkowy;
     private javax.swing.ButtonGroup rgSposobPodsumowania;
@@ -155,6 +253,12 @@ public class PanelKonfiguracji extends javax.swing.JPanel implements IPanelKonfi
         cbPodsumowanieZbiorcze.setEnabled(czyDoEdycji);
         rbLista.setEnabled(czyDoEdycji);
         rbWykresSlupkowy.setEnabled(czyDoEdycji);
+        cbBezKomentarzy.setEnabled(czyDoEdycji);
+        cbBezZdjec.setEnabled(czyDoEdycji);
+        lbBezKomentarzy.setEnabled(czyDoEdycji);
+        lbBezZdjec.setEnabled(czyDoEdycji);
+        lBezKomentarzy.setEnabled(czyDoEdycji);
+        lBezZdjec.setEnabled(czyDoEdycji);
     }
 
     public JPanel getPanel() {

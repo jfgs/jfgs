@@ -20,6 +20,7 @@ import java.util.HashMap;
 import com.aetrion.flickr.photos.comments.Comment;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -102,6 +103,26 @@ public class ZdjecieMiesiaca implements ILogika {
      * strony jest i tak liniowy i szybki
      */
     private static final int zdjecNaStrone = 333;
+
+    /**
+     * Szukanie osób, którzy nie dodali zdjęć
+     */
+    private Boolean drukujBrakZdjec = false;
+
+    /**
+     * Szukanie osób, którzy nie komentowali
+     */
+    private Boolean drukujBrakKomentarzy = false;
+    
+    /*
+     * Ile miesięcy bez zdjęc jest do zaakceptowania
+     */
+    private int mcBezZdjec = 0;
+
+    /**
+     * Ile miesięcy bez komentarzy jest do zaakceptowanie
+     */
+    private int mcBezKomentarzy = 0;
     
     private KontrolerGUI kgui;
     private DaneWyjsciowe dw;    
@@ -115,6 +136,7 @@ public class ZdjecieMiesiaca implements ILogika {
      * @param groupID
      * @param dataOd
      * @param dataDo
+     * @param extDataOd rozszerzona data początku zakresu
      * @return
      * @throws java.io.IOException
      * @throws org.xml.sax.SAXException
@@ -124,7 +146,9 @@ public class ZdjecieMiesiaca implements ILogika {
         final Flickr f,
         final String groupID,
         final Date dataOd,
-        final Date dataDo) throws IOException, SAXException, FlickrException
+        final Date dataDo,
+        final Date extDataOd
+    ) throws IOException, SAXException, FlickrException
     {
 
         dw.drukujSeparator("Analizowane zdjęcia");
@@ -140,8 +164,9 @@ public class ZdjecieMiesiaca implements ILogika {
          * Pobranie listy wszystkich zdjęć
          */
         {
-            
-            ArrayList<Photo> zal = null;
+            // modyfikujemy zakres interesujących nas zdjęć jeżeli potrzeba
+            Date poczatek = (drukujBrakKomentarzy || drukujBrakZdjec) ? extDataOd : dataOd;
+            Date koniec = dataDo;
 
             /*
              * Najpierw pobieramy strony z interesującego nas zakresu dat,
@@ -185,19 +210,21 @@ public class ZdjecieMiesiaca implements ILogika {
                         ((Photo) analizowana.get(
                             analizowana.size()-1)).getDateAdded();
 
-                    if (dataPierwszego.before(dataOd) && dataOstatniego.before(dataOd)) {
+                    // poza zakresem dat dla zakresu rozszerzonego lub podstawowego
+                    if (dataPierwszego.before(poczatek) && dataOstatniego.before(koniec))
+                    {
 
-                        /*
-                         * Jeżeli początek i koniec strony jest
-                         * starszy niż data początku zakresu to
-                         * nie ma sensu analizować zdjęć wcześniejszych
-                         */
-                        analizujNastepnaStrone = false;
-                        break;
+                            /*
+                             * Jeżeli początek i koniec strony jest
+                             * starszy niż data początku zakresu to
+                             * nie ma sensu analizować zdjęć wcześniejszych
+                             */
+                            analizujNastepnaStrone = false;
+                            break;
 
                     }
 
-                    if (dataPierwszego.after(dataDo) && dataOstatniego.after(dataDo)) {
+                    if (dataPierwszego.after(koniec) && dataOstatniego.after(koniec)) {
 
                         /*
                          * Jeżeli początek i koniec strony jest młodszy
@@ -232,7 +259,9 @@ public class ZdjecieMiesiaca implements ILogika {
     private ArrayList<Photo> dajListeZdjec(
         final ArrayList<PhotoList> strony,
         final Date dataOd, 
-        final Date dataDo)
+        final Date dataDo,
+        final Date extDataOd,
+        final HashMap<String, Date> ostatnieZdjecieAutora)
     {
 
         ArrayList<Photo> 
@@ -243,6 +272,9 @@ public class ZdjecieMiesiaca implements ILogika {
          * początku i końca poza zakresem dat
          */
         {
+
+            Date poczatek = (drukujBrakKomentarzy || drukujBrakZdjec) ? extDataOd : dataOd;
+            Date koniec = dataDo;
 
             kgui.ustawPostepStr(
                 "Analizowanie zdjęć wyszukanych stron");
@@ -255,14 +287,26 @@ public class ZdjecieMiesiaca implements ILogika {
 
                     Photo p = (Photo) is.next();
 
+                    /**
+                     * Szukamy ostatniego zdjęcia autora
+                     */
+                    if (drukujBrakZdjec
+                        && !p.getDateAdded().before(extDataOd)
+                        && (!ostatnieZdjecieAutora.containsKey(p.getOwner().getUsername())
+                            || p.getDateAdded().after(ostatnieZdjecieAutora.get(p.getOwner().getUsername()))))
+                    {
+                        ostatnieZdjecieAutora.put(p.getOwner().getUsername(), p.getDateAdded());
+                    }
+
                     /*
                      * Warunek na kryteria wyboru zdjęć
                      */
-                    if (!p.getDateAdded().after(dataOd)
-                        || !p.getDateAdded().before(dataDo))
+                    if (!p.getDateAdded().after(poczatek)
+                        || !p.getDateAdded().before(koniec))
                     {
 
                         // zdjęcie poza zakresem badanych dat
+                        // na razie analizujemy także rozszerzony początek
 
                     } else {
 
@@ -296,15 +340,19 @@ public class ZdjecieMiesiaca implements ILogika {
         final Flickr f,
         final String groupID,
         final Date dataOd,
-        final Date dataDo
+        final Date dataDo,
+        final Date extDataOd,
+        final HashMap<String, Date> ostatnieZdjecieAutora
     ) throws IOException, SAXException, FlickrException
     {
 
         ArrayList<Photo>
             zal = dajListeZdjec(
-                dajStrony(f, groupID, dataOd, dataDo),
+                dajStrony(f, groupID, dataOd, dataDo, extDataOd),
                 dataOd,
-                dataDo);
+                dataDo,
+                extDataOd,
+                ostatnieZdjecieAutora);
         
         Photo[] z = new Photo[zal.size()];
         zal.toArray(z);
@@ -323,7 +371,9 @@ public class ZdjecieMiesiaca implements ILogika {
      */
     private HashMap<String, String> dajAutorow(
         final Photo[] zdjecia,
-        final HashMap<String, StatystykaAutora> aktywnosc)
+        final HashMap<String, StatystykaAutora> aktywnosc,
+        final Date dataOd,
+        final Date extDataOd)
     {
 
         HashMap<String, String> autorzy = new HashMap<String, String>();
@@ -339,36 +389,44 @@ public class ZdjecieMiesiaca implements ILogika {
 
             for(int i=0; i<zdjecia.length; i++) {
 
-                if (poprzedniId == null
-                    || !poprzedniId.equals(zdjecia[i].getOwner().getId()))
-                {
+                /**
+                 * Teoretycznie mogą być tutaj zdjęcia z roszerzonego zakresu,
+                 * pomijamy je
+                 */
+                if (!zdjecia[i].getDateAdded().before(dataOd)) {
+                    
+                    if (poprzedniId == null
+                        || !poprzedniId.equals(zdjecia[i].getOwner().getId()))
+                    {
 
-                    if (poprzedniId != null) {
+                        if (poprzedniId != null) {
+
+                            /*
+                             * Zmiana autora, dodajemy podsumowanie liczby zdjęć
+                             */
+                            aktywnosc.put(
+                                poprzedniId,
+                                new StatystykaAutora(
+                                    0,
+                                    zdjecPoprzedniego,
+                                    poprzUserName));
+
+                        }
 
                         /*
-                         * Zmiana autora, dodajemy podsumowanie liczby zdjęć
+                         * Kolejny autor
                          */
-                        aktywnosc.put(
-                            poprzedniId,
-                            new StatystykaAutora(
-                                0,
-                                zdjecPoprzedniego,
-                                poprzUserName));
+                        poprzedniId = zdjecia[i].getOwner().getId();
+                        poprzUserName = zdjecia[i].getOwner().getUsername();
+                        zdjecPoprzedniego = 0;
+
+                        autorzy.put(poprzedniId, poprzUserName);
 
                     }
 
-                    /*
-                     * Kolejny autor
-                     */
-                    poprzedniId = zdjecia[i].getOwner().getId();
-                    poprzUserName = zdjecia[i].getOwner().getUsername();
-                    zdjecPoprzedniego = 0;
-
-                    autorzy.put(poprzedniId, poprzUserName);
+                    zdjecPoprzedniego++;
 
                 }
-
-                zdjecPoprzedniego++;
 
             }
 
@@ -401,10 +459,15 @@ public class ZdjecieMiesiaca implements ILogika {
      */
     private int policzKomentarzeZdjecia(
         final String photoId,
+        final Date photoDateAdded,
+        final String photoUserName,
         final String ownerId,
         final CommentsInterface ci,
         final HashMap<String, String> autorzy,
-        final HashMap<String, StatystykaAutora> aktywnosc
+        final HashMap<String, StatystykaAutora> aktywnosc,
+        final HashMap<String, Date> ostatniKomentarzAutora,
+        final Date dataOd,
+        final Date extDataOd
     ) throws FlickrException, IOException, SAXException
     {
         
@@ -437,45 +500,66 @@ public class ZdjecieMiesiaca implements ILogika {
 
             } else {
 
-                if (!autorzy.containsKey(komentarz.getAuthor())) {
+                /**
+                 * Szukamy ostatniego komentarza autora (pod nieswoim zdjęciem)
+                 */
+                if (drukujBrakKomentarzy
+                    && !photoDateAdded.before(extDataOd)
+                    && (!ostatniKomentarzAutora.containsKey(photoUserName)
+                        || photoDateAdded.after(ostatniKomentarzAutora.get(photoUserName))))
+                {
+                    ostatniKomentarzAutora.put(photoUserName, photoDateAdded);
+                }
 
-                    /*
-                     * Komentarz napisany przez użytkownika nie
-                     * posiadającego zdjęcia w interesującym nas okresie
-                     * więc go pomijamy
-                     */
-                    continue;
+                if (photoDateAdded.before(dataOd)) {
+
+                    // zdjęcie poza prawdziwym obszarem zainteresowań,
+                    // analizujemy komentarze, ale nie liczymy już aktywności
+                    // danego autora
 
                 } else {
 
-                    /*
-                     * Kolejne komentarze liczymy mniej hojnie
-                     */
-                    boolean
-                        komentowalJuz = komentowaliJuz.containsKey(
-                            komentarz.getAuthor());
+                    if (!autorzy.containsKey(komentarz.getAuthor())) {
 
-                    /*
-                     * Zapisujemy kto już komentował
-                     */
-                    if (!komentowalJuz) {
-                        komentowaliJuz.put(komentarz.getAuthor(), "");
-                    }
+                        /*
+                         * Komentarz napisany przez użytkownika nie
+                         * posiadającego zdjęcia w interesującym nas okresie
+                         * więc go pomijamy
+                         */
+                        continue;
 
-                    /*
-                     * Aktualizujemy klucz, wszystkie klucze dodane
-                     * są już wyżej
-                     */
-                    StatystykaAutora s = aktywnosc.get(komentarz.getAuthor());
+                    } else {
 
-                    s.dodajKomentarz(
-                            (komentowalJuz
-                                ? VAL_KOLEJNY_KOMENTARZ
-                                : VAL_PIERWSZY_KOMENTARZ));
+                        /*
+                         * Kolejne komentarze liczymy mniej hojnie
+                         */
+                        boolean
+                            komentowalJuz = komentowaliJuz.containsKey(
+                                komentarz.getAuthor());
 
-                    aktywnosc.put(komentarz.getAuthor(), s);
+                        /*
+                         * Zapisujemy kto już komentował
+                         */
+                        if (!komentowalJuz) {
+                            komentowaliJuz.put(komentarz.getAuthor(), "");
+                        }
 
-                } // komentarz spoza grupy autorów zdjęć
+                        /*
+                         * Aktualizujemy klucz, wszystkie klucze dodane
+                         * są już wyżej
+                         */
+                        StatystykaAutora s = aktywnosc.get(komentarz.getAuthor());
+
+                        s.dodajKomentarz(
+                                (komentowalJuz
+                                    ? VAL_KOLEJNY_KOMENTARZ
+                                    : VAL_PIERWSZY_KOMENTARZ));
+
+                        aktywnosc.put(komentarz.getAuthor(), s);
+
+                    } // komentarz spoza grupy autorów zdjęć
+
+                } // komentarze zdjęcia przed datą początku obowiązywania
 
             } // komentarz inny niż autora zdjęcia
 
@@ -501,7 +585,10 @@ public class ZdjecieMiesiaca implements ILogika {
         final Photo[] zdjecia,
         final HashMap<String, StatystykaAutora> aktywnosc,
         final HashMap<String, String> autorzy,
-        final StringBuffer kodhtml
+        final StringBuffer kodhtml,
+        final HashMap<String, Date> ostatniKomentarzAutora,
+        final Date dataOd,
+        final Date extDataOd
     ) throws FlickrException, IOException, SAXException 
     {
 
@@ -515,6 +602,9 @@ public class ZdjecieMiesiaca implements ILogika {
             final CommentsInterface ci = f.getCommentsInterface();
 
             kgui.ustawPostepMax(zdjecia.length - 1);
+
+            // nie wszystkie zdjęcia drukujemy
+            int drukowaneZdjecie = 1;
 
             /*
              * Główna pętla po wszystkich zdjęciach
@@ -537,42 +627,59 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 }
 
-                kodhtml.append(
-                    dw.formatujLiczbe(noZdjecia + 1)                            // liczymy od jedynki
-                    + ": &lt;a href=&quot;"
-                    + zdjecia[noZdjecia].getUrl()
-                    + "&quot;&gt;&lt;img src=&quot;"
-                    + zdjecia[noZdjecia].getSmallUrl()
-                    + "&quot;&gt;&lt;/a&gt;"
-                    + "\n"
-                );
-
                 kz =
                     policzKomentarzeZdjecia(
                         zdjecia[noZdjecia].getId(),
+                        zdjecia[noZdjecia].getDateAdded(),
+                        zdjecia[noZdjecia].getOwner().getUsername(),
                         zdjecia[noZdjecia].getOwner().getId(),
                         ci,
                         autorzy,
-                        aktywnosc);
+                        aktywnosc,
+                        ostatniKomentarzAutora,
+                        dataOd,
+                        extDataOd);
 
-                dw.drukujLinie(
-                    dw.formatujLiczbe(noZdjecia + 1)                            // liczymy od jedynki
-                    + ": "
-                    + "<a href=\""
-                    + zdjecia[noZdjecia].getUrl()
-                    + "\">"
-                    + dajNazweZdjecia(zdjecia[noZdjecia].getTitle())
-                    + "</a>"
-                    + " by "
-                    + zdjecia[noZdjecia].getOwner().getUsername()
-                    + " ("
-                    + (kz == 0
-                        ? "<b>" + kz + "</b>"
-                        : "" + kz)
-                    + ")"
-                    + ", "
-                    + dw.formatujDate(zdjecia[noZdjecia].getDateAdded())
-                );
+                if (zdjecia[noZdjecia].getDateAdded().before(dataOd)) {
+
+                    // to zdjęcie jest z roszerzonego zakresu i nie
+                    // będzie drukowane, było użyte tylko do analizy
+                    // dat komentarzy
+
+                } else {
+
+                    kodhtml.append(
+                        dw.formatujLiczbe(drukowaneZdjecie)
+                        + ": &lt;a href=&quot;"
+                        + zdjecia[noZdjecia].getUrl()
+                        + "&quot;&gt;&lt;img src=&quot;"
+                        + zdjecia[noZdjecia].getSmallUrl()
+                        + "&quot;&gt;&lt;/a&gt;"
+                        + "\n"
+                    );
+
+                    dw.drukujLinie(
+                        dw.formatujLiczbe(drukowaneZdjecie)
+                        + ": "
+                        + "<a href=\""
+                        + zdjecia[noZdjecia].getUrl()
+                        + "\">"
+                        + dajNazweZdjecia(zdjecia[noZdjecia].getTitle())
+                        + "</a>"
+                        + " by "
+                        + zdjecia[noZdjecia].getOwner().getUsername()
+                        + " ("
+                        + (kz == 0
+                            ? "<b>" + kz + "</b>"
+                            : "" + kz)
+                        + ")"
+                        + ", "
+                        + dw.formatujDate(zdjecia[noZdjecia].getDateAdded())
+                    );
+
+                    drukowaneZdjecie++;
+
+                }
 
             } // wszystkie wybrane zdjęcia
 
@@ -696,7 +803,8 @@ public class ZdjecieMiesiaca implements ILogika {
      * @param zdjecia
      */
     private void drukujPodsumowaniePopularnosci(
-        final Photo[] zdjecia)
+        final Photo[] zdjecia,
+        final Date dataOd)
     {
 
         /*
@@ -707,6 +815,10 @@ public class ZdjecieMiesiaca implements ILogika {
             Photo[] top = new Photo[liczbaZestawieniaNajbardziejPopularnych];
 
             for(int ip=0; ip<zdjecia.length; ip++) {
+
+                if (zdjecia[ip].getDateAdded().before(dataOd)) {
+                    continue;
+                }
 
                 /*
                  * Czy zdjęcie wchodzi na ostatnią pozycję listy TOP
@@ -780,7 +892,8 @@ public class ZdjecieMiesiaca implements ILogika {
      */
     private void drukujKostkeMiniaturek(
         final Photo[] zdjecia,
-        final StringBuffer kodhtml)
+        final StringBuffer kodhtml,
+        final Date dataOd)
     {
         /*
          * Warunek wydruku kostki miniaturek
@@ -792,6 +905,10 @@ public class ZdjecieMiesiaca implements ILogika {
             int zdjecieWKostce = 1;
 
             for(int ip=0; ip<zdjecia.length; ip++) {
+
+                if (zdjecia[ip].getDateAdded().before(dataOd)) {
+                    continue;
+                }
 
                 dw.drukuj(
                     "<a href=\""
@@ -862,7 +979,10 @@ public class ZdjecieMiesiaca implements ILogika {
          * Kod html do głosowania
          */
         final StringBuffer kodhtml = new StringBuffer("");
-       
+
+        final HashMap<String, Date> ostatnieZdjecieAutora = new HashMap<String, Date>();
+        final HashMap<String, Date> ostatniKomentarzAutora = new HashMap<String, Date>();
+
         try {
 
             /*
@@ -908,10 +1028,25 @@ public class ZdjecieMiesiaca implements ILogika {
             final HashMap<String, StatystykaAutora>
                 aktywnosc = new HashMap<String, StatystykaAutora>();
 
+            Date extDataOd = null;
+
+            /*
+             * Przesuwamy w ukryciu datę końca aby móc zrobić statystyki
+             */
+            if ((drukujBrakKomentarzy || drukujBrakZdjec)) {
+
+                Calendar c = Calendar.getInstance();
+                c.setTime(dataOd);
+                c.add(Calendar.MONTH, -Math.max(mcBezZdjec, mcBezKomentarzy));
+                extDataOd = c.getTime();
+
+            }
+            
             /*
              * Kolekcja zdjęć w zakresie kryteriów
              */
-            final Photo[] zdjecia = dajTabliceZdjec(f, groupID, dataOd, dataDo);
+            final Photo[] zdjecia = dajTabliceZdjec(
+                f, groupID, dataOd, dataDo, extDataOd, ostatnieZdjecieAutora);
 
             /*
              * Główna pętla, analiza zdjęć i wypisanie ich na ekran
@@ -935,10 +1070,17 @@ public class ZdjecieMiesiaca implements ILogika {
                  */
                 final HashMap<String, String>
                     autorzy =
-                        dajAutorow(zdjecia, aktywnosc);
+                        dajAutorow(zdjecia, aktywnosc, dataOd, extDataOd);
 
                 wykonajLiczenieKomentarzy(
-                    f, zdjecia, aktywnosc, autorzy, kodhtml);
+                    f,
+                    zdjecia,
+                    aktywnosc,
+                    autorzy,
+                    kodhtml,
+                    ostatniKomentarzAutora,
+                    dataOd,
+                    extDataOd);
 
             }
 
@@ -948,9 +1090,96 @@ public class ZdjecieMiesiaca implements ILogika {
 
             drukujPodsumowanieZbiorcze(aktywnosc);
 
-            drukujPodsumowaniePopularnosci(zdjecia);
+            drukujPodsumowaniePopularnosci(zdjecia, dataOd);
 
-            drukujKostkeMiniaturek(zdjecia, kodhtml);
+            drukujKostkeMiniaturek(zdjecia, kodhtml, dataOd);
+
+            {
+                if (drukujBrakZdjec) {
+
+                    dw.drukujSeparator("***");
+
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(dataDo);
+                    c.add(Calendar.MONTH, -mcBezZdjec);
+                    Date granica = c.getTime();
+
+                    dw.drukujLinie("Użytkownicy, którzy dodali swoje ostatnie " 
+                        + "zdjęcia przed "+dw.formatujDate(granica)+"\n");
+
+                    Iterator<String> i = ostatnieZdjecieAutora.keySet().iterator();
+
+                    while(i.hasNext()) {
+                        String id = i.next();
+                        if(granica.after(ostatnieZdjecieAutora.get(id))) {
+                            dw.drukujLinie(
+                                "*) "
+                                + id
+                                + ", "
+                                + dw.formatujDate(ostatnieZdjecieAutora.get(id)));
+                        }
+                    }
+
+                    dw.drukujLinie("\npozostali analizowani\n");
+
+                    i = ostatnieZdjecieAutora.keySet().iterator();
+
+                    while(i.hasNext()) {
+                        String id = i.next();
+                        if(!granica.after(ostatnieZdjecieAutora.get(id))) {
+                            dw.drukujLinie(
+                                "*) "
+                                + id
+                                + ", "
+                                + dw.formatujDate(ostatnieZdjecieAutora.get(id)));
+                        }
+                    }
+
+                }
+
+                if (drukujBrakKomentarzy) {
+
+                    dw.drukujSeparator("***");
+
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(dataDo);
+                    c.add(Calendar.MONTH, -mcBezKomentarzy);
+                    Date granica = c.getTime();
+
+                    dw.drukujLinie("Użytkownicy, którzy ostatni raz komentowali cudze "
+                        + "zdjęcia przed "+dw.formatujDate(granica)+"\n");
+
+                    Iterator<String> i = ostatniKomentarzAutora.keySet().iterator();
+
+                    while(i.hasNext()) {
+                        String id = i.next();
+                        if(granica.after(ostatniKomentarzAutora.get(id))) {
+                            dw.drukujLinie(
+                                "*) "
+                                + id
+                                + ", "
+                                + dw.formatujDate(ostatniKomentarzAutora.get(id)));
+                        }
+                    }
+
+                    dw.drukujLinie("\npozostali analizowani\n");
+
+                    i = ostatniKomentarzAutora.keySet().iterator();
+
+                    while(i.hasNext()) {
+                        String id = i.next();
+                        if(!granica.after(ostatniKomentarzAutora.get(id))) {
+                            dw.drukujLinie(
+                                "*) "
+                                + id
+                                + ", "
+                                + dw.formatujDate(ostatniKomentarzAutora.get(id)));
+                        }
+                    }
+
+                }
+                
+            }
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -973,7 +1202,7 @@ public class ZdjecieMiesiaca implements ILogika {
     }
 
     public void podlaczGUI(KontrolerGUI kontroler) {
-        
+
         this.kgui = kontroler;
 
         if (kontroler.getPanelKonfiguracyjny() != null) {
@@ -988,6 +1217,10 @@ public class ZdjecieMiesiaca implements ILogika {
                 dodajKodHTML = pk.dajKodHTML();
                 wykresLista = pk.dajWykresLista();
                 wykresSlupkowy = pk.dajWykresSlupkowy();
+                drukujBrakKomentarzy = pk.dajDrukujBezKomentarzy();
+                drukujBrakZdjec = pk.dajDrukujBezZdjec();
+                mcBezZdjec = pk.dajLiczbeMcBezZdjec().intValue();
+                mcBezKomentarzy = pk.dajLiczbeMcBezKomentarzy().intValue();
 
             } else {
                 throw new RuntimeException("Zły panel konfiguracyjny!");
