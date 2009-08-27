@@ -76,7 +76,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="jmDodaj">
               <Properties>
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+UP"/>
+                  <KeyStroke key="Ctrl+N"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="68"/>
                 <Property name="text" type="java.lang.String" value="Dodaj miesi&#x105;c"/>
@@ -88,7 +88,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="jmOdejmij">
               <Properties>
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+DOWN"/>
+                  <KeyStroke key="Ctrl+P"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="79"/>
                 <Property name="text" type="java.lang.String" value="Odejmij miesi&#x105;c"/>

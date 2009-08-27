@@ -437,7 +437,7 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         });
         jmEdytuj.add(jmDzis);
 
-        jmDodaj.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_UP, java.awt.event.InputEvent.CTRL_MASK));
+        jmDodaj.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
         jmDodaj.setMnemonic('D');
         jmDodaj.setText("Dodaj miesiąc");
         jmDodaj.addActionListener(new java.awt.event.ActionListener() {
@@ -447,7 +447,7 @@ public class StatsFrame extends javax.swing.JFrame implements IStats {
         });
         jmEdytuj.add(jmDodaj);
 
-        jmOdejmij.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DOWN, java.awt.event.InputEvent.CTRL_MASK));
+        jmOdejmij.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
         jmOdejmij.setMnemonic('O');
         jmOdejmij.setText("Odejmij miesiąc");
         jmOdejmij.addActionListener(new java.awt.event.ActionListener() {
