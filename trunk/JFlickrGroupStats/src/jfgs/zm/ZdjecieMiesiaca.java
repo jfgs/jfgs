@@ -505,11 +505,11 @@ public class ZdjecieMiesiaca implements ILogika {
                  */
                 if (drukujBrakKomentarzy
                     && !photoDateAdded.before(extDataOd)
-                    && (!ostatniKomentarzAutora.containsKey(photoUserName)
-                        || photoDateAdded.after(ostatniKomentarzAutora.get(photoUserName))))
+                    && (!ostatniKomentarzAutora.containsKey(komentarz.getAuthor())
+                        || photoDateAdded.after(ostatniKomentarzAutora.get(komentarz.getAuthor()))))
                 {
-                    ostatniKomentarzAutora.put(photoUserName, photoDateAdded);
-                }
+                    ostatniKomentarzAutora.put(komentarz.getAuthor(), photoDateAdded);
+                } 
 
                 if (photoDateAdded.before(dataOd)) {
 
@@ -1153,13 +1153,22 @@ public class ZdjecieMiesiaca implements ILogika {
 
                     while(i.hasNext()) {
                         String id = i.next();
-                        if(granica.after(ostatniKomentarzAutora.get(id))) {
-                            dw.drukujLinie(
-                                "*) "
-                                + id
-                                + ", "
-                                + dw.formatujDate(ostatniKomentarzAutora.get(id)));
+
+                        // @TODO z powodu błędu w MembersInterface nie potrafię pobrać
+                        // listy użytkowników grupy, ograniczam komentarze do tych, którzy dodali
+                        // zdjęcia
+                        if (aktywnosc.containsKey(id)) {
+
+                            if(granica.after(ostatniKomentarzAutora.get(id))) {
+                                dw.drukujLinie(
+                                    "*) "
+                                    + f.getPeopleInterface().getInfo(id).getUsername()
+                                    + ", "
+                                    + dw.formatujDate(ostatniKomentarzAutora.get(id)));
+                            }
+
                         }
+
                     }
 
                     dw.drukujLinie("\npozostali analizowani\n");
@@ -1168,13 +1177,22 @@ public class ZdjecieMiesiaca implements ILogika {
 
                     while(i.hasNext()) {
                         String id = i.next();
-                        if(!granica.after(ostatniKomentarzAutora.get(id))) {
-                            dw.drukujLinie(
-                                "*) "
-                                + id
-                                + ", "
-                                + dw.formatujDate(ostatniKomentarzAutora.get(id)));
+
+                        // @TODO z powodu błędu w MembersInterface nie potrafię pobrać
+                        // listy użytkowników grupy, ograniczam komentarze do tych, którzy dodali
+                        // zdjęcia
+                        if (aktywnosc.containsKey(id)) {
+
+                            if(!granica.after(ostatniKomentarzAutora.get(id))) {
+                                dw.drukujLinie(
+                                    "*) "
+                                    + f.getPeopleInterface().getInfo(id).getUsername()
+                                    + ", "
+                                    + dw.formatujDate(ostatniKomentarzAutora.get(id)));
+                            }
+
                         }
+                        
                     }
 
                 }
