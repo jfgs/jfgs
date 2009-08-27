@@ -372,8 +372,7 @@ public class ZdjecieMiesiaca implements ILogika {
     private HashMap<String, String> dajAutorow(
         final Photo[] zdjecia,
         final HashMap<String, StatystykaAutora> aktywnosc,
-        final Date dataOd,
-        final Date extDataOd)
+        final Date dataOd)
     {
 
         HashMap<String, String> autorzy = new HashMap<String, String>();
@@ -460,7 +459,6 @@ public class ZdjecieMiesiaca implements ILogika {
     private int policzKomentarzeZdjecia(
         final String photoId,
         final Date photoDateAdded,
-        final String photoUserName,
         final String ownerId,
         final CommentsInterface ci,
         final HashMap<String, String> autorzy,
@@ -630,8 +628,7 @@ public class ZdjecieMiesiaca implements ILogika {
                 kz =
                     policzKomentarzeZdjecia(
                         zdjecia[noZdjecia].getId(),
-                        zdjecia[noZdjecia].getDateAdded(),
-                        zdjecia[noZdjecia].getOwner().getUsername(),
+                        zdjecia[noZdjecia].getDateAdded(),                        
                         zdjecia[noZdjecia].getOwner().getId(),
                         ci,
                         autorzy,
@@ -1070,7 +1067,7 @@ public class ZdjecieMiesiaca implements ILogika {
                  */
                 final HashMap<String, String>
                     autorzy =
-                        dajAutorow(zdjecia, aktywnosc, dataOd, extDataOd);
+                        dajAutorow(zdjecia, aktywnosc, dataOd);
 
                 wykonajLiczenieKomentarzy(
                     f,
