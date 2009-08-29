@@ -7,6 +7,7 @@ package jfgs.zm;
 
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.FlickrException;
+import com.aetrion.flickr.groups.members.Member;
 import jfgs.narzedzia.DaneWyjsciowe;
 import com.aetrion.flickr.groups.pools.PoolsInterface;
 import com.aetrion.flickr.photos.Extras;
@@ -24,7 +25,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import javax.xml.parsers.ParserConfigurationException;
 import jfgs.gui.KontrolerGUI;
+import jfgs.narzedzia.Autoryzer;
 import jfgs.narzedzia.ILogika;
 import jfgs.narzedzia.IPanelKonfiguracyjny;
 import jfgs.narzedzia.PhotoComparatorWgAutora;
@@ -292,10 +295,10 @@ public class ZdjecieMiesiaca implements ILogika {
                      */
                     if (drukujBrakZdjec
                         && !p.getDateAdded().before(extDataOd)
-                        && (!ostatnieZdjecieAutora.containsKey(p.getOwner().getUsername())
-                            || p.getDateAdded().after(ostatnieZdjecieAutora.get(p.getOwner().getUsername()))))
+                        && (!ostatnieZdjecieAutora.containsKey(p.getOwner().getId())
+                            || p.getDateAdded().after(ostatnieZdjecieAutora.get(p.getOwner().getId()))))
                     {
-                        ostatnieZdjecieAutora.put(p.getOwner().getUsername(), p.getDateAdded());
+                        ostatnieZdjecieAutora.put(p.getOwner().getId(), p.getDateAdded());
                     }
 
                     /*
@@ -465,7 +468,8 @@ public class ZdjecieMiesiaca implements ILogika {
         final HashMap<String, StatystykaAutora> aktywnosc,
         final HashMap<String, Date> ostatniKomentarzAutora,
         final Date dataOd,
-        final Date extDataOd
+        final Date extDataOd,
+        final HashMap<String, String> uzytkownicy
     ) throws FlickrException, IOException, SAXException
     {
         
@@ -496,6 +500,10 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 // Komentarze pod zdjęciem autora nie liczymy
 
+            } else if(!uzytkownicy.containsKey(komentarz.getAuthor())) {
+
+                // Komentarze ludzi spoza grupy ignorujemy
+
             } else {
 
                 /**
@@ -504,9 +512,9 @@ public class ZdjecieMiesiaca implements ILogika {
                 if (drukujBrakKomentarzy
                     && !photoDateAdded.before(extDataOd)
                     && (!ostatniKomentarzAutora.containsKey(komentarz.getAuthor())
-                        || photoDateAdded.after(ostatniKomentarzAutora.get(komentarz.getAuthor()))))
+                        || komentarz.getDateCreate().after(ostatniKomentarzAutora.get(komentarz.getAuthor()))))
                 {
-                    ostatniKomentarzAutora.put(komentarz.getAuthor(), photoDateAdded);
+                    ostatniKomentarzAutora.put(komentarz.getAuthor(), komentarz.getDateCreate());
                 } 
 
                 if (photoDateAdded.before(dataOd)) {
@@ -586,7 +594,8 @@ public class ZdjecieMiesiaca implements ILogika {
         final StringBuffer kodhtml,
         final HashMap<String, Date> ostatniKomentarzAutora,
         final Date dataOd,
-        final Date extDataOd
+        final Date extDataOd,
+        final HashMap<String, String> uzytkownicy
     ) throws FlickrException, IOException, SAXException 
     {
 
@@ -635,7 +644,8 @@ public class ZdjecieMiesiaca implements ILogika {
                         aktywnosc,
                         ostatniKomentarzAutora,
                         dataOd,
-                        extDataOd);
+                        extDataOd,
+                        uzytkownicy);
 
                 if (zdjecia[noZdjecia].getDateAdded().before(dataOd)) {
 
@@ -979,6 +989,7 @@ public class ZdjecieMiesiaca implements ILogika {
 
         final HashMap<String, Date> ostatnieZdjecieAutora = new HashMap<String, Date>();
         final HashMap<String, Date> ostatniKomentarzAutora = new HashMap<String, Date>();
+        final HashMap<String, String> uzytkownicy;
 
         try {
 
@@ -989,6 +1000,8 @@ public class ZdjecieMiesiaca implements ILogika {
             final Date dataDo = kgui.dajDataDo();
             final String groupID = kgui.getGroupId();
             final Flickr f = kgui.getFlickr();
+            
+            uzytkownicy = dajListeUzytkownikow(f, groupID);
 
             /*
              * Nagłówek
@@ -1034,7 +1047,10 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 Calendar c = Calendar.getInstance();
                 c.setTime(dataOd);
-                c.add(Calendar.MONTH, -Math.max(mcBezZdjec, mcBezKomentarzy));
+
+                // minus jeden aby zobaczyć także ciut przed zakresem
+                c.add(Calendar.MONTH, -Math.max(mcBezZdjec, mcBezKomentarzy)-1);
+
                 extDataOd = c.getTime();
 
             }
@@ -1077,7 +1093,8 @@ public class ZdjecieMiesiaca implements ILogika {
                     kodhtml,
                     ostatniKomentarzAutora,
                     dataOd,
-                    extDataOd);
+                    extDataOd,
+                    uzytkownicy);
 
             }
 
@@ -1090,6 +1107,8 @@ public class ZdjecieMiesiaca implements ILogika {
             drukujPodsumowaniePopularnosci(zdjecia, dataOd);
 
             drukujKostkeMiniaturek(zdjecia, kodhtml, dataOd);
+
+            final String POZA_ZAKRESEM = "(<i>poza zakresem</i>)";
 
             {
                 if (drukujBrakZdjec) {
@@ -1104,32 +1123,55 @@ public class ZdjecieMiesiaca implements ILogika {
                     dw.drukujLinie("Użytkownicy, którzy dodali swoje ostatnie " 
                         + "zdjęcia przed "+dw.formatujDate(granica)+"\n");
 
-                    Iterator<String> i = ostatnieZdjecieAutora.keySet().iterator();
+                    Iterator<String> i = uzytkownicy.keySet().iterator();
 
+                    // wszyscy użytkownicy
                     while(i.hasNext()) {
+
                         String id = i.next();
-                        if(granica.after(ostatnieZdjecieAutora.get(id))) {
+                        
+                        // zapisana data ostatniego zdjęcia
+                        if (ostatnieZdjecieAutora.containsKey(id)) {
+
+                            // zdjęcie poza granicą
+                            if(granica.after(ostatnieZdjecieAutora.get(id))) {
+                                dw.drukujLinie(
+                                    "*) "
+                                    + uzytkownicy.get(id)
+                                    + ", "
+                                    + dw.formatujDate(ostatnieZdjecieAutora.get(id)));
+                            }
+
+                        } else {
+
                             dw.drukujLinie(
-                                "*) "
-                                + id
-                                + ", "
-                                + dw.formatujDate(ostatnieZdjecieAutora.get(id)));
+                                    "*) "
+                                    + uzytkownicy.get(id)
+                                    + ", "
+                                    + POZA_ZAKRESEM);
+
                         }
+
                     }
 
                     dw.drukujLinie("\npozostali analizowani\n");
 
                     i = ostatnieZdjecieAutora.keySet().iterator();
 
+                    // wszyscy użytkownicy
                     while(i.hasNext()) {
+
                         String id = i.next();
+
+                        // zdjęcie w granicach zakresu
                         if(!granica.after(ostatnieZdjecieAutora.get(id))) {
                             dw.drukujLinie(
                                 "*) "
-                                + id
+                                + uzytkownicy.get(id)
                                 + ", "
                                 + dw.formatujDate(ostatnieZdjecieAutora.get(id)));
                         }
+
                     }
 
                 }
@@ -1146,23 +1188,32 @@ public class ZdjecieMiesiaca implements ILogika {
                     dw.drukujLinie("Użytkownicy, którzy ostatni raz komentowali cudze "
                         + "zdjęcia przed "+dw.formatujDate(granica)+"\n");
 
-                    Iterator<String> i = ostatniKomentarzAutora.keySet().iterator();
+                    Iterator<String> i = uzytkownicy.keySet().iterator();
 
+                    // wszyscy użytkownicy
                     while(i.hasNext()) {
+
                         String id = i.next();
 
-                        // @TODO z powodu błędu w MembersInterface nie potrafię pobrać
-                        // listy użytkowników grupy, ograniczam komentarze do tych, którzy dodali
-                        // zdjęcia
-                        if (aktywnosc.containsKey(id)) {
+                        // zapisana data ostatniego komentarza
+                        if (ostatniKomentarzAutora.containsKey(id)) {
 
+                            // data ostatniego komentarza przed zakresem
                             if(granica.after(ostatniKomentarzAutora.get(id))) {
                                 dw.drukujLinie(
                                     "*) "
-                                    + f.getPeopleInterface().getInfo(id).getUsername()
+                                    + uzytkownicy.get(id)
                                     + ", "
                                     + dw.formatujDate(ostatniKomentarzAutora.get(id)));
                             }
+
+                        } else {
+
+                            dw.drukujLinie(
+                                "*) "
+                                + uzytkownicy.get(id)
+                                + ", "
+                                + POZA_ZAKRESEM);
 
                         }
 
@@ -1172,24 +1223,20 @@ public class ZdjecieMiesiaca implements ILogika {
 
                     i = ostatniKomentarzAutora.keySet().iterator();
 
+                    // wszyscy użytkownicy
                     while(i.hasNext()) {
+
                         String id = i.next();
 
-                        // @TODO z powodu błędu w MembersInterface nie potrafię pobrać
-                        // listy użytkowników grupy, ograniczam komentarze do tych, którzy dodali
-                        // zdjęcia
-                        if (aktywnosc.containsKey(id)) {
-
-                            if(!granica.after(ostatniKomentarzAutora.get(id))) {
-                                dw.drukujLinie(
-                                    "*) "
-                                    + f.getPeopleInterface().getInfo(id).getUsername()
-                                    + ", "
-                                    + dw.formatujDate(ostatniKomentarzAutora.get(id)));
-                            }
-
+                        // data ostatniego komentarza przed zakresem
+                        if(!granica.after(ostatniKomentarzAutora.get(id))) {
+                            dw.drukujLinie(
+                                "*) "
+                                + uzytkownicy.get(id)
+                                + ", "
+                                + dw.formatujDate(ostatniKomentarzAutora.get(id)));
                         }
-                        
+
                     }
 
                 }
@@ -1214,6 +1261,58 @@ public class ZdjecieMiesiaca implements ILogika {
         dw.pokazOkno();
 
         return ILogika.WYKONANIE_POPRAWNE;
+    }
+
+    /**
+     * Zwraca listę użytkowników danej grupy
+     * @return
+     */
+    public HashMap<String, String> dajListeUzytkownikow(
+        final Flickr f,
+        final String groupID
+    ) throws Exception {
+
+        /*
+         * Autoryzacja przebiega dzięki klasie ThreadLocal gdzie zapisane jest to
+         * co wczytujemy w GUI, każdy oddzielny wątek musi być ponownie autoryzowany
+         */
+        Autoryzer.get().autoryzuj(kgui);
+
+        HashMap<String, String> u = new HashMap<String, String>();
+
+        int strona = 1;
+        int uzytkownikowStrony = 0;
+        final int uzytkownikowNaStrone = 5;
+        boolean pobierzStrone = true;
+
+        /*
+         * Do pobrania wszystkie strony użytkowników
+         */
+        while(pobierzStrone) {
+
+            uzytkownikowStrony = 0;
+
+            Iterator i = f.getMembersInterface().getList(groupID, null, uzytkownikowNaStrone, strona).iterator();
+            while(i.hasNext()) {
+                uzytkownikowStrony++;
+                Member m = (Member) i.next();
+                u.put(m.getId(), m.getUserName());
+            }
+
+            /*
+             * Jeżeli na tej stronie był komplet to trzeba pobrać kolejną
+             */
+            if (uzytkownikowStrony == uzytkownikowNaStrone) {
+                pobierzStrone = true;
+                strona++;
+            } else {
+                pobierzStrone = false;
+            }
+
+        }
+
+        return u;
+
     }
 
     public void podlaczGUI(KontrolerGUI kontroler) {
