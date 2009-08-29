@@ -97,7 +97,6 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="cbPodsumowaniePopularnosci">
       <Properties>
-        <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Drukuj podsumowanie popularno&#x15b;ci"/>
       </Properties>
     </Component>
