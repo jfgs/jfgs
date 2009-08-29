@@ -56,7 +56,6 @@ public class PanelKonfiguracji extends javax.swing.JPanel implements IPanelKonfi
             }
         });
 
-        cbPodsumowaniePopularnosci.setSelected(true);
         cbPodsumowaniePopularnosci.setText("Drukuj podsumowanie popularności");
 
         cbKostkaMiniatur.setSelected(true);
