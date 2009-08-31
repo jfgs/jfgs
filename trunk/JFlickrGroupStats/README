@@ -1,0 +1,15 @@
+README
+
+JFlickrGroupStats is Java desktop application. Program can gather statistics 
+of the Flickr groups. The main aim of the program is count photos and comments 
+added under photos. Summary show which user uploading photos without commenting 
+photos of other users.
+
+JFlickrGroupStats
+http://code.google.com/p/jfgs/
+
+
+CREDITS
+
+JFlickrGroupStats is using flickrj library - Java wrapper for the Flickr API. 
+http://sourceforge.net/projects/flickrj/
