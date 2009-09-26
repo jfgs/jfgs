@@ -1081,7 +1081,8 @@ public class ZdjecieMiesiaca implements ILogika {
     private void drukujBrakKomentarzy(
         final Date dataDo,
         final HashMap uzytkownicy,
-        final HashMap<String, Date> ostatniKomentarzAutora)
+        final HashMap<String, Date> ostatniKomentarzAutora,
+        final HashMap<String, Date> ostatnieZdjecieAutora)
     {
 
         if (drukujBrakKomentarzy) {
@@ -1136,13 +1137,26 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 String id = i.next();
 
+                String dodatkoweInfo = "";
+                if (drukujBrakZdjec) {
+
+                    if (ostatniKomentarzAutora.get(id).before(ostatnieZdjecieAutora.get(id))) {
+                        dodatkoweInfo =
+                            " (przed zdjęciem z dnia "
+                            + dw.formatujDate(ostatnieZdjecieAutora.get(id))
+                            + ")";
+                    }
+
+                }
+
                 // data ostatniego komentarza przed zakresem
                 if(!granica.after(ostatniKomentarzAutora.get(id))) {
                     dw.drukujLinie(
                         "*) "
                         + uzytkownicy.get(id)
                         + ", "
-                        + dw.formatujDate(ostatniKomentarzAutora.get(id)));
+                        + dw.formatujDate(ostatniKomentarzAutora.get(id))
+                        + dodatkoweInfo);
                 }
 
             }
@@ -1299,7 +1313,8 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 drukujBrakZdjec(dataDo, uzytkownicy, ostatnieZdjecieAutora);
 
-                drukujBrakKomentarzy(dataDo, uzytkownicy, ostatniKomentarzAutora);
+                drukujBrakKomentarzy(dataDo, uzytkownicy, 
+                    ostatniKomentarzAutora, ostatnieZdjecieAutora);
 
             }
 
