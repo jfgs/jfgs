@@ -87,7 +87,7 @@ public class ZdjecieMiesiaca implements ILogika {
      * Liczba miniatur w wierszu, trzeba zmieścić się w szerokości pola
      * do komentarzy
      */
-    private static final int liczbaZdjecWierszaKostkiMiniaturek = 5;
+    private static final int LICZBA_ZDJEC_WIERSZA_KOSTKI_MINIATUR = 5;
 
     /**
      * Czy generujemy zestawienie zdjęć najbardziej oglądanych
@@ -99,7 +99,7 @@ public class ZdjecieMiesiaca implements ILogika {
      * Liczba zestawienia zdjęć najbardziej popularnych
      * @see dodajPodsumowaniePopularnosci
      */
-    private static final int liczbaZestawieniaNajbardziejPopularnych = 10;
+    private static final int LICZBA_ZESTAWIENIA_NAJBARDZIEJ_POPULARNYCH = 10;
 
     /**
      * Premiujemy pierwszy komentarz pod cudzym zdjęciem
@@ -117,17 +117,22 @@ public class ZdjecieMiesiaca implements ILogika {
      * lokalnie nic nas nie kosztuje, koszt odrzucenia zdjęć w obrębie
      * strony jest i tak liniowy i szybki
      */
-    private static final int zdjecNaStrone = 333;
+    private static final int ZDJEC_NA_STRONE = 333;
+
+    /**
+     * Stała używana podczas drukowania dat ostatnich komentarzy i zdjęć
+     */
+    final String POZA_ZAKRESEM = "(<i>poza zakresem</i>)";
 
     /**
      * Szukanie osób, którzy nie dodali zdjęć
      */
-    private Boolean drukujBrakZdjec = false;
+    private boolean drukujBrakZdjec = false;
 
     /**
      * Szukanie osób, którzy nie komentowali
      */
-    private Boolean drukujBrakKomentarzy = false;
+    private boolean drukujBrakKomentarzy = false;
     
     /*
      * Ile miesięcy bez zdjęc jest do zaakceptowania
@@ -208,7 +213,7 @@ public class ZdjecieMiesiaca implements ILogika {
                             groupID,
                             new String[]{},
                             dodatkoweParametry,
-                            zdjecNaStrone,
+                            ZDJEC_NA_STRONE,
                             numerAnalizowanejStrony);
 
                     numerAnalizowanejStrony++;
@@ -280,7 +285,7 @@ public class ZdjecieMiesiaca implements ILogika {
     {
 
         ArrayList<Photo> 
-            zal = new ArrayList<Photo>(zdjecNaStrone * strony.size());
+            zal = new ArrayList<Photo>(ZDJEC_NA_STRONE * strony.size());
 
         /*
          * Wydłubanie interesujących nas zdjęć z stron, odrzucenie
@@ -831,7 +836,7 @@ public class ZdjecieMiesiaca implements ILogika {
          */
         if (dodajPodsumowaniePopularnosci) {
 
-            Photo[] top = new Photo[liczbaZestawieniaNajbardziejPopularnych];
+            Photo[] top = new Photo[LICZBA_ZESTAWIENIA_NAJBARDZIEJ_POPULARNYCH];
 
             for(int ip=0; ip<zdjecia.length; ip++) {
 
@@ -869,7 +874,7 @@ public class ZdjecieMiesiaca implements ILogika {
 
             } // wszystkie zdjęcia
 
-            dw.drukujSeparator("TOP"+liczbaZestawieniaNajbardziejPopularnych);
+            dw.drukujSeparator("TOP"+LICZBA_ZESTAWIENIA_NAJBARDZIEJ_POPULARNYCH);
 
             dw.drukujLinie("Poniżej najbardziej popularne zdjęcia wg liczby odsłon.");
             dw.drukujLinie("");
@@ -951,7 +956,7 @@ public class ZdjecieMiesiaca implements ILogika {
                  * Na koniec wiersza i po ostatnim zdjęciu chcemy mieć
                  * znak nowej linii
                  */
-                if (zdjecieWKostce % liczbaZdjecWierszaKostkiMiniaturek == 0
+                if (zdjecieWKostce % LICZBA_ZDJEC_WIERSZA_KOSTKI_MINIATUR == 0
                     || (ip == zdjecia.length - 1))
                 {
                     dw.drukujLinie("");
@@ -986,6 +991,166 @@ public class ZdjecieMiesiaca implements ILogika {
 
     }
 
+    /**
+     * Drukowanie braku zdjęć w analizowanym zakresie
+     *
+     * @param dataDo data końca analizowanego okresu
+     * @param uzytkownicy użytkownicy grupy
+     * @param ostatnieZdjecieAutora statystyka ostatnich zdjęć wg autora
+     */
+    private void drukujBrakZdjec(
+        final Date dataDo,
+        final HashMap uzytkownicy,
+        final HashMap<String, Date> ostatnieZdjecieAutora)
+    {
+
+        if (drukujBrakZdjec) {
+
+            dw.drukujSeparator("***");
+
+            Calendar c = Calendar.getInstance();
+            c.setTime(dataDo);
+            c.add(Calendar.MONTH, -mcBezZdjec);
+            Date granica = c.getTime();
+
+            dw.drukujLinie("Użytkownicy, którzy dodali swoje ostatnie "
+                + "zdjęcia przed "+dw.formatujDate(granica)+"\n");
+
+            Iterator<String> i = uzytkownicy.keySet().iterator();
+
+            // wszyscy użytkownicy
+            while(i.hasNext()) {
+
+                String id = i.next();
+
+                // zapisana data ostatniego zdjęcia
+                if (ostatnieZdjecieAutora.containsKey(id)) {
+
+                    // zdjęcie poza granicą
+                    if(granica.after(ostatnieZdjecieAutora.get(id))) {
+                        dw.drukujLinie(
+                            "*) "
+                            + uzytkownicy.get(id)
+                            + ", "
+                            + dw.formatujDate(ostatnieZdjecieAutora.get(id)));
+                    }
+
+                } else {
+
+                    dw.drukujLinie(
+                            "*) "
+                            + uzytkownicy.get(id)
+                            + ", "
+                            + POZA_ZAKRESEM);
+
+                }
+
+            }
+
+            dw.drukujLinie("\npozostali analizowani\n");
+
+            i = ostatnieZdjecieAutora.keySet().iterator();
+
+            // wszyscy użytkownicy
+            while(i.hasNext()) {
+
+                String id = i.next();
+
+                // zdjęcie w granicach zakresu
+                if(!granica.after(ostatnieZdjecieAutora.get(id))) {
+                    dw.drukujLinie(
+                        "*) "
+                        + uzytkownicy.get(id)
+                        + ", "
+                        + dw.formatujDate(ostatnieZdjecieAutora.get(id)));
+                }
+
+            }
+
+        }
+
+    }
+
+    /**
+     * Drukowanie braku komentarzy w analizowanym zakresie
+     *
+     * @param dataDo data końca analizowanego okresu
+     * @param uzytkownicy użytkownicy grupy
+     * @param ostatniKomentarzAutora statystyka ostatnich komentarzy wg autora
+     */
+    private void drukujBrakKomentarzy(
+        final Date dataDo,
+        final HashMap uzytkownicy,
+        final HashMap<String, Date> ostatniKomentarzAutora)
+    {
+
+        if (drukujBrakKomentarzy) {
+
+            dw.drukujSeparator("***");
+
+            Calendar c = Calendar.getInstance();
+            c.setTime(dataDo);
+            c.add(Calendar.MONTH, -mcBezKomentarzy);
+            Date granica = c.getTime();
+
+            dw.drukujLinie("Użytkownicy, którzy ostatni raz komentowali cudze "
+                + "zdjęcia przed "+dw.formatujDate(granica)+"\n");
+
+            Iterator<String> i = uzytkownicy.keySet().iterator();
+
+            // wszyscy użytkownicy
+            while(i.hasNext()) {
+
+                String id = i.next();
+
+                // zapisana data ostatniego komentarza
+                if (ostatniKomentarzAutora.containsKey(id)) {
+
+                    // data ostatniego komentarza przed zakresem
+                    if(granica.after(ostatniKomentarzAutora.get(id))) {
+                        dw.drukujLinie(
+                            "*) "
+                            + uzytkownicy.get(id)
+                            + ", "
+                            + dw.formatujDate(ostatniKomentarzAutora.get(id)));
+                    }
+
+                } else {
+
+                    dw.drukujLinie(
+                        "*) "
+                        + uzytkownicy.get(id)
+                        + ", "
+                        + POZA_ZAKRESEM);
+
+                }
+
+            }
+
+            dw.drukujLinie("\npozostali analizowani\n");
+
+            i = ostatniKomentarzAutora.keySet().iterator();
+
+            // wszyscy użytkownicy
+            while(i.hasNext()) {
+
+                String id = i.next();
+
+                // data ostatniego komentarza przed zakresem
+                if(!granica.after(ostatniKomentarzAutora.get(id))) {
+                    dw.drukujLinie(
+                        "*) "
+                        + uzytkownicy.get(id)
+                        + ", "
+                        + dw.formatujDate(ostatniKomentarzAutora.get(id)));
+                }
+
+            }
+
+        }
+
+    }
+
     public int wykonajZadanie() {
 
         if (kgui == null) {
@@ -1013,7 +1178,7 @@ public class ZdjecieMiesiaca implements ILogika {
             final String groupID = kgui.getGroupId();
             final Flickr f = kgui.getFlickr();
             
-            uzytkownicy = dajListeUzytkownikow(f, groupID);
+            uzytkownicy = dajListeUzytkownikowGrupy(f, groupID);
 
             /*
              * Nagłówek
@@ -1050,6 +1215,9 @@ public class ZdjecieMiesiaca implements ILogika {
             final HashMap<String, StatystykaAutora>
                 aktywnosc = new HashMap<String, StatystykaAutora>();
 
+            /*
+             * Data początku rozszerzonego zakresu do analizy
+             */
             Date extDataOd = null;
 
             /*
@@ -1064,6 +1232,14 @@ public class ZdjecieMiesiaca implements ILogika {
                 c.add(Calendar.MONTH, -Math.max(mcBezZdjec, mcBezKomentarzy)-1);
 
                 extDataOd = c.getTime();
+
+            } else {
+
+                /*
+                 * Jawnie, ta data może być pusta gdy nie potrzebujemy badać
+                 * rozszerzonego zakresu
+                 */
+                extDataOd = null;
 
             }
             
@@ -1113,146 +1289,18 @@ public class ZdjecieMiesiaca implements ILogika {
             /*
              * Poniżej akcje wykonane po przeanalizowaniu całej puli zdjęć
              */
-
-            drukujPodsumowanieZbiorcze(aktywnosc);
-
-            drukujPodsumowaniePopularnosci(zdjecia, dataOd);
-
-            drukujKostkeMiniaturek(zdjecia, kodhtml, dataOd);
-
-            final String POZA_ZAKRESEM = "(<i>poza zakresem</i>)";
-
             {
-                if (drukujBrakZdjec) {
 
-                    dw.drukujSeparator("***");
+                drukujPodsumowanieZbiorcze(aktywnosc);
 
-                    Calendar c = Calendar.getInstance();
-                    c.setTime(dataDo);
-                    c.add(Calendar.MONTH, -mcBezZdjec);
-                    Date granica = c.getTime();
+                drukujPodsumowaniePopularnosci(zdjecia, dataOd);
 
-                    dw.drukujLinie("Użytkownicy, którzy dodali swoje ostatnie " 
-                        + "zdjęcia przed "+dw.formatujDate(granica)+"\n");
+                drukujKostkeMiniaturek(zdjecia, kodhtml, dataOd);
 
-                    Iterator<String> i = uzytkownicy.keySet().iterator();
+                drukujBrakZdjec(dataDo, uzytkownicy, ostatnieZdjecieAutora);
 
-                    // wszyscy użytkownicy
-                    while(i.hasNext()) {
+                drukujBrakKomentarzy(dataDo, uzytkownicy, ostatniKomentarzAutora);
 
-                        String id = i.next();
-                        
-                        // zapisana data ostatniego zdjęcia
-                        if (ostatnieZdjecieAutora.containsKey(id)) {
-
-                            // zdjęcie poza granicą
-                            if(granica.after(ostatnieZdjecieAutora.get(id))) {
-                                dw.drukujLinie(
-                                    "*) "
-                                    + uzytkownicy.get(id)
-                                    + ", "
-                                    + dw.formatujDate(ostatnieZdjecieAutora.get(id)));
-                            }
-
-                        } else {
-
-                            dw.drukujLinie(
-                                    "*) "
-                                    + uzytkownicy.get(id)
-                                    + ", "
-                                    + POZA_ZAKRESEM);
-
-                        }
-
-                    }
-
-                    dw.drukujLinie("\npozostali analizowani\n");
-
-                    i = ostatnieZdjecieAutora.keySet().iterator();
-
-                    // wszyscy użytkownicy
-                    while(i.hasNext()) {
-
-                        String id = i.next();
-
-                        // zdjęcie w granicach zakresu
-                        if(!granica.after(ostatnieZdjecieAutora.get(id))) {
-                            dw.drukujLinie(
-                                "*) "
-                                + uzytkownicy.get(id)
-                                + ", "
-                                + dw.formatujDate(ostatnieZdjecieAutora.get(id)));
-                        }
-
-                    }
-
-                }
-
-                if (drukujBrakKomentarzy) {
-
-                    dw.drukujSeparator("***");
-
-                    Calendar c = Calendar.getInstance();
-                    c.setTime(dataDo);
-                    c.add(Calendar.MONTH, -mcBezKomentarzy);
-                    Date granica = c.getTime();
-
-                    dw.drukujLinie("Użytkownicy, którzy ostatni raz komentowali cudze "
-                        + "zdjęcia przed "+dw.formatujDate(granica)+"\n");
-
-                    Iterator<String> i = uzytkownicy.keySet().iterator();
-
-                    // wszyscy użytkownicy
-                    while(i.hasNext()) {
-
-                        String id = i.next();
-
-                        // zapisana data ostatniego komentarza
-                        if (ostatniKomentarzAutora.containsKey(id)) {
-
-                            // data ostatniego komentarza przed zakresem
-                            if(granica.after(ostatniKomentarzAutora.get(id))) {
-                                dw.drukujLinie(
-                                    "*) "
-                                    + uzytkownicy.get(id)
-                                    + ", "
-                                    + dw.formatujDate(ostatniKomentarzAutora.get(id)));
-                            }
-
-                        } else {
-
-                            dw.drukujLinie(
-                                "*) "
-                                + uzytkownicy.get(id)
-                                + ", "
-                                + POZA_ZAKRESEM);
-
-                        }
-
-                    }
-
-                    dw.drukujLinie("\npozostali analizowani\n");
-
-                    i = ostatniKomentarzAutora.keySet().iterator();
-
-                    // wszyscy użytkownicy
-                    while(i.hasNext()) {
-
-                        String id = i.next();
-
-                        // data ostatniego komentarza przed zakresem
-                        if(!granica.after(ostatniKomentarzAutora.get(id))) {
-                            dw.drukujLinie(
-                                "*) "
-                                + uzytkownicy.get(id)
-                                + ", "
-                                + dw.formatujDate(ostatniKomentarzAutora.get(id)));
-                        }
-
-                    }
-
-                }
-                
             }
 
         } catch (Exception ex) {
@@ -1279,7 +1327,7 @@ public class ZdjecieMiesiaca implements ILogika {
      * Zwraca listę użytkowników danej grupy
      * @return
      */
-    public HashMap<String, String> dajListeUzytkownikow(
+    public HashMap<String, String> dajListeUzytkownikowGrupy(
         final Flickr f,
         final String groupID
     ) throws Exception {
