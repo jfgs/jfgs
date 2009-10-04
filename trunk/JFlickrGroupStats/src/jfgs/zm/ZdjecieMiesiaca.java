@@ -1017,22 +1017,34 @@ public class ZdjecieMiesiaca implements ILogika {
                 + "zdjęcia przed "+dw.formatujDate(granica)+"\n");
 
             Iterator<String> i = uzytkownicy.keySet().iterator();
+            boolean rekordPozaZakresem = false;
 
             // wszyscy użytkownicy
             while(i.hasNext()) {
 
                 String id = i.next();
 
+                /*
+                 * Musimy uważać, na tych co już się wypisali z grupy
+                 */
+                if (!uzytkownicy.containsKey(id)) {
+                    continue;
+                }
+
                 // zapisana data ostatniego zdjęcia
                 if (ostatnieZdjecieAutora.containsKey(id)) {
 
                     // zdjęcie poza granicą
                     if(granica.after(ostatnieZdjecieAutora.get(id))) {
+
                         dw.drukujLinie(
                             "*) "
                             + uzytkownicy.get(id)
                             + ", "
                             + dw.formatujDate(ostatnieZdjecieAutora.get(id)));
+
+                        rekordPozaZakresem = true;
+
                     }
 
                 } else {
@@ -1043,18 +1055,34 @@ public class ZdjecieMiesiaca implements ILogika {
                             + ", "
                             + POZA_ZAKRESEM);
 
+                    rekordPozaZakresem = true;
+
                 }
+
+            }
+
+            if (!rekordPozaZakresem) {
+
+                dw.drukujLinie(
+                    "*) Brak");
 
             }
 
             dw.drukujLinie("\npozostali analizowani\n");
 
             i = ostatnieZdjecieAutora.keySet().iterator();
-
+            
             // wszyscy użytkownicy
             while(i.hasNext()) {
 
                 String id = i.next();
+
+                /*
+                 * Musimy uważać, na tych co już się wypisali z grupy
+                 */
+                if (!uzytkownicy.containsKey(id)) {
+                    continue;
+                }
 
                 // zdjęcie w granicach zakresu
                 if(!granica.after(ostatnieZdjecieAutora.get(id))) {
@@ -1098,22 +1126,34 @@ public class ZdjecieMiesiaca implements ILogika {
                 + "zdjęcia przed "+dw.formatujDate(granica)+"\n");
 
             Iterator<String> i = uzytkownicy.keySet().iterator();
+            boolean rekordPozaZakresem = false;
 
             // wszyscy użytkownicy
             while(i.hasNext()) {
 
                 String id = i.next();
 
+                /*
+                 * Musimy uważać, na tych co już się wypisali z grupy
+                 */
+                if (!uzytkownicy.containsKey(id)) {
+                    continue;
+                }
+
                 // zapisana data ostatniego komentarza
                 if (ostatniKomentarzAutora.containsKey(id)) {
 
                     // data ostatniego komentarza przed zakresem
                     if(granica.after(ostatniKomentarzAutora.get(id))) {
+
                         dw.drukujLinie(
                             "*) "
                             + uzytkownicy.get(id)
                             + ", "
                             + dw.formatujDate(ostatniKomentarzAutora.get(id)));
+                    
+                        rekordPozaZakresem = true;
+
                     }
 
                 } else {
@@ -1124,7 +1164,16 @@ public class ZdjecieMiesiaca implements ILogika {
                         + ", "
                         + POZA_ZAKRESEM);
 
+                    rekordPozaZakresem = true;
+
                 }
+
+            }
+
+            if (!rekordPozaZakresem) {
+
+                dw.drukujLinie(
+                    "*) Brak");
 
             }
 
@@ -1136,6 +1185,13 @@ public class ZdjecieMiesiaca implements ILogika {
             while(i.hasNext()) {
 
                 String id = i.next();
+
+                /*
+                 * Musimy uważać, na tych co już się wypisali z grupy
+                 */
+                if (!uzytkownicy.containsKey(id)) {
+                    continue;
+                }
 
                 String dodatkoweInfo = "";
                 if (drukujBrakZdjec) {
