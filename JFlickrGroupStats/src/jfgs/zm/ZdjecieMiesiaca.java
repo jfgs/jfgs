@@ -771,7 +771,8 @@ public class ZdjecieMiesiaca implements ILogika {
             Arrays.sort(sat);
 
             if (wykresSlupkowy) {
-                WykresSlupkowy ws = new WykresSlupkowy();
+                
+                final WykresSlupkowy ws = new WykresSlupkowy();
 
                 for (StatystykaAutora sa : sat) {
 
@@ -793,7 +794,8 @@ public class ZdjecieMiesiaca implements ILogika {
 
             } else if(wykresLista) {
 
-                final String separator = ";";
+                final String separator = "; ";
+                final WykresSlupkowy ws = new WykresSlupkowy();
 
                 dw.drukujLinie(
                     "Nazwa" + separator +
@@ -804,10 +806,16 @@ public class ZdjecieMiesiaca implements ILogika {
                 for (StatystykaAutora sa : sat) {
 
                     dw.drukujLinie(
-                        sa.dajNazwe() + separator +
-                        sa.dajLiczbeZdjec() + separator +
-                        sa.dajLiczbeKomentarzy() + separator +
-                        sa.dajWartosc());
+                        sa.dajNazwe()
+                        + separator
+                        + ws.getFormat().format(sa.dajLiczbeZdjec())
+                        + separator
+                        + ws.getFormat().format(sa.dajLiczbeKomentarzy())
+                        + separator
+                        + "<b>"
+                        + ws.getFormat().format(sa.dajWartosc())
+                        + "</b>"
+                    );
 
                 }
 
@@ -1262,6 +1270,13 @@ public class ZdjecieMiesiaca implements ILogika {
                     "miesiąca. Poprzednie głosowania można zobaczyć w <a href" +
                     "=\"http://www.flickr.com/search/groups/?q=Podsumowanie" +
                     "&m=discuss&w=71956997%40N00&s=act\">archiwum grupy</a>.");
+
+                dw.drukujLinie("");
+
+                dw.drukujLinie(
+                    "Regulamin głosowania jest dostępny w <a href=\"http://www." +
+                    "flickr.com/groups/71956997@N00/discuss/72157622705055642/" +
+                    "\">osobnym wątku</a>. ");
 
                 dw.drukujSeparator();
 
