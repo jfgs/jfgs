@@ -115,6 +115,14 @@ public class DaneWyjsciowe {
     }
 
     /**
+     * Nagłówki
+     * @param naglowek
+     */
+    public void drukujNaglowek(String naglowek) {
+        drukujSeparator("<u>"+naglowek.toUpperCase()+"</u>");
+    }
+
+    /**
      * Wydruk separatora graficznego z nagłówkiem
      * @param naglowek
      */

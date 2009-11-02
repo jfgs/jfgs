@@ -143,6 +143,11 @@ public class ZdjecieMiesiaca implements ILogika {
      * Ile miesięcy bez komentarzy jest do zaakceptowanie
      */
     private int mcBezKomentarzy = 0;
+
+    /**
+     * Czy drukujemy nowym układem strony, narazie bez GUI
+     */
+    private boolean nowyUkladStrony = true;
     
     private KontrolerGUI kgui;
     private DaneWyjsciowe dw;    
@@ -672,34 +677,80 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 } else {
 
-                    kodhtml.append(
-                        dw.formatujLiczbe(drukowaneZdjecie)
-                        + ": &lt;a href=&quot;"
-                        + zdjecia[noZdjecia].getUrl()
-                        + "&quot;&gt;&lt;img src=&quot;"
-                        + zdjecia[noZdjecia].getSmallUrl()
-                        + "&quot;&gt;&lt;/a&gt;"
-                        + "\n"
-                    );
+                    if (!nowyUkladStrony) {
 
-                    dw.drukujLinie(
-                        dw.formatujLiczbe(drukowaneZdjecie)
-                        + ": "
-                        + "<a href=\""
-                        + zdjecia[noZdjecia].getUrl()
-                        + "\">"
-                        + dajNazweZdjecia(zdjecia[noZdjecia].getTitle())
-                        + "</a>"
-                        + " by "
-                        + zdjecia[noZdjecia].getOwner().getUsername()
-                        + " ("
-                        + (kz == 0
-                            ? "<b>" + kz + "</b>"
-                            : "" + kz)
-                        + ")"
-                        + ", "
-                        + dw.formatujDate(zdjecia[noZdjecia].getDateAdded())
-                    );
+                        kodhtml.append(
+                            dw.formatujLiczbe(drukowaneZdjecie)
+                            + ": &lt;a href=&quot;"
+                            + zdjecia[noZdjecia].getUrl()
+                            + "&quot;&gt;&lt;img src=&quot;"
+                            + zdjecia[noZdjecia].getSmallUrl()
+                            + "&quot;&gt;&lt;/a&gt;"
+                            + "\n"
+                        );
+
+                        dw.drukujLinie(
+                            dw.formatujLiczbe(drukowaneZdjecie)
+                            + ": "
+                            + "<a href=\""
+                            + zdjecia[noZdjecia].getUrl()
+                            + "\">"
+                            + dajNazweZdjecia(zdjecia[noZdjecia].getTitle())
+                            + "</a>"
+                            + " by "
+                            + zdjecia[noZdjecia].getOwner().getUsername()
+                            + " ("
+                            + (kz == 0
+                                ? "<b>" + kz + "</b>"
+                                : "" + kz)
+                            + ")"
+                            + ", "
+                            + dw.formatujDate(zdjecia[noZdjecia].getDateAdded())
+                        );
+
+                    } else {
+
+                        dw.drukuj(
+                            "<a href=\""
+                            + zdjecia[noZdjecia].getUrl()
+                            + "\" "
+                            + "title=\""
+                            + zdjecia[noZdjecia].getTitle()
+                            + " by "
+                            + zdjecia[noZdjecia].getOwner().getUsername()
+                            + ", on Flickr\">"
+                            + "<img src=\""
+                            + zdjecia[noZdjecia].getSmallUrl()
+                            + "\" "
+                            + "alt=\""
+                            + zdjecia[noZdjecia].getTitle()
+                            + "\" /></a>");
+
+                        dw.drukujLinie("<blockquote>");
+
+                        dw.drukujLinie(
+                            "Lp. "
+                            + dw.formatujLiczbe(drukowaneZdjecie)
+                            + ", \"<u>"
+                            + dajNazweZdjecia(zdjecia[noZdjecia].getTitle())                            
+                            + "</u>\" by <u>"
+                            + zdjecia[noZdjecia].getOwner().getUsername()
+                            + "</u>"
+                        );
+                        
+                        dw.drukujLinie("");
+
+                        dw.drukujLinie(
+                            "<i>&lt;a href=&quot;"
+                            + zdjecia[noZdjecia].getUrl()
+                            + "&quot;&gt;\n&nbsp;&nbsp;&nbsp;&nbsp;&lt;img src=&quot;"
+                            + zdjecia[noZdjecia].getSmallUrl()
+                            + "&quot;&gt;\n&lt;/a&gt;</i>"
+                        );
+
+                        dw.drukujLinie("</blockquote>");
+
+                    }
 
                     drukowaneZdjecie++;
 
@@ -732,7 +783,7 @@ public class ZdjecieMiesiaca implements ILogika {
          */
         if (dodajPodsumowanieZbiorcze) {
 
-            dw.drukujSeparator("Podsumowanie");
+            dw.drukujNaglowek("Podsumowanie");
 
             dw.drukujLinie(
                   "Wykres poniżej prezentuje liczbę dodanych do grupy zdjęć do"
@@ -930,7 +981,7 @@ public class ZdjecieMiesiaca implements ILogika {
         /*
          * Warunek wydruku kostki miniaturek
          */
-        if (dodajKostkeMiniaturek) {
+        if (!nowyUkladStrony && dodajKostkeMiniaturek) {
 
             dw.drukujSeparator("Podgląd zdjęć");
 
@@ -975,16 +1026,10 @@ public class ZdjecieMiesiaca implements ILogika {
             }
 
             dw.drukujLinie("");
-            dw.drukujLinie(
-                "Wybrane zdjęcia poprzednich miesięcy można oglądać <a " +
-                "href=\"http://www.flickr.com/groups/71956997@N00/pool/tags" +
-                "/zdj%C4%99ciemiesi%C4%85cagrupyszczerekomentarze/\">w " +
-                "zdjęciach grupy SK z tagiem <i>Zdjęcie miesiąca grupy " +
-                "Szczere komentarze</i></a>.");
-
+            
         }
 
-        if (dodajKodHTML) {
+        if (!nowyUkladStrony && dodajKodHTML) {
 
             dw.drukujSeparator("Kod HTML");
 
@@ -1263,33 +1308,32 @@ public class ZdjecieMiesiaca implements ILogika {
              */
             {
 
+                dw.drukujNaglowek(kgui.getNazwaGrupy());
+
+                dw.drukujLinie(
+                    "Zdjęcia dodane od "
+                    + dw.formatujDate(dataOd)
+                    + " i przed "
+                    + dw.formatujDate(dataDo)
+                    + ".");
+
                 dw.drukujSeparator();
 
                 dw.drukujLinie(
                     "Jak co miesiąc zapraszam do głosowania na zdjęcie " +
                     "miesiąca. Poprzednie głosowania można zobaczyć w <a href" +
                     "=\"http://www.flickr.com/search/groups/?q=Podsumowanie" +
-                    "&m=discuss&w=71956997%40N00&s=act\">archiwum grupy</a>.");
-
-                dw.drukujLinie("");
-
-                dw.drukujLinie(
+                    "&m=discuss&w=71956997%40N00&s=act\">archiwum grupy</a>. " +
                     "Regulamin głosowania jest dostępny w <a href=\"http://www." +
                     "flickr.com/groups/71956997@N00/discuss/72157622705055642/" +
-                    "\">osobnym wątku</a>. ");
+                    "\">osobnym wątku</a>. " +
+                    "Wybrane zdjęcia poprzednich miesięcy można oglądać w " +
+                    "zdjęciach grupy SK z tagiem: \"<a " +
+                    "href=\"http://www.flickr.com/groups/71956997@N00/pool/tags" +
+                    "/zdj%C4%99ciemiesi%C4%85cagrupyszczerekomentarze/\">Zdjęcie miesiąca grupy " +
+                    "Szczere komentarze</a>\".");
 
                 dw.drukujSeparator();
-
-                dw.drukujLinie(
-                    "Grupa: "
-                    + kgui.getNazwaGrupy());
-
-                dw.drukujLinie(
-                    "Zdjęcia dodane po "
-                    + dw.formatujDate(dataOd)
-                    + " i przed "
-                    + dw.formatujDate(dataDo)
-                    + ".");
 
             }
 
