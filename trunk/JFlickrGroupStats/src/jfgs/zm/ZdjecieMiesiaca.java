@@ -720,7 +720,7 @@ public class ZdjecieMiesiaca implements ILogika {
                             + zdjecia[noZdjecia].getOwner().getUsername()
                             + ", on Flickr\">"
                             + "<img src=\""
-                            + zdjecia[noZdjecia].getSmallUrl()
+                            + zdjecia[noZdjecia].getMediumUrl()
                             + "\" "
                             + "alt=\""
                             + zdjecia[noZdjecia].getTitle()
@@ -1401,6 +1401,25 @@ public class ZdjecieMiesiaca implements ILogika {
                 final HashMap<String, String>
                     autorzy =
                         dajAutorow(zdjecia, aktywnosc, dataOd);
+
+                /*
+                 * Mieszanie zdjęć
+                 */
+                {
+                    int n = 0;
+
+                    for (int i=0; i<zdjecia.length; i++) {
+
+                        n = (int) Math.round(
+                            Math.random()*(zdjecia.length - 1));
+
+                        Photo pp = zdjecia[i];
+                        zdjecia[i] = zdjecia[n];
+                        zdjecia[n] = pp;
+
+                    }
+
+                }
 
                 wykonajLiczenieKomentarzy(
                     f,
