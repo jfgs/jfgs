@@ -981,7 +981,7 @@ public class ZdjecieMiesiaca implements ILogika {
         /*
          * Warunek wydruku kostki miniaturek
          */
-        if (!nowyUkladStrony && dodajKostkeMiniaturek) {
+        if (!dodajKostkeMiniaturek) {
 
             dw.drukujSeparator("Podgląd zdjęć");
 
