@@ -333,10 +333,14 @@ public class ZdjecieMiesiaca implements ILogika {
                         // zdjęcie poza zakresem badanych dat
                         // na razie analizujemy także rozszerzony początek
 
+                    } else if (!p.isPublicFlag()) {
+                    
+                        // zdjęcia, które nie są publiczne pomijamy
+                    
                     } else {
 
                         zal.add(p);
-
+                        
                     }
 
                 } // zdjęcia strony
@@ -494,7 +498,7 @@ public class ZdjecieMiesiaca implements ILogika {
         final HashMap<String, String> uzytkownicy
     ) throws FlickrException, IOException, SAXException
     {
-        
+
         Collection komentarze = ci.getList(photoId);
 
         /*
@@ -981,7 +985,7 @@ public class ZdjecieMiesiaca implements ILogika {
         /*
          * Warunek wydruku kostki miniaturek
          */
-        if (!dodajKostkeMiniaturek) {
+        if (dodajKostkeMiniaturek) {
 
             dw.drukujSeparator("Podgląd zdjęć");
 
