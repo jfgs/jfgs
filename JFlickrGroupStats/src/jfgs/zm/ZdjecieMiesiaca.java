@@ -1253,7 +1253,10 @@ public class ZdjecieMiesiaca implements ILogika {
                 String dodatkoweInfo = "";
                 if (drukujBrakZdjec) {
 
-                    if (ostatniKomentarzAutora.get(id).before(ostatnieZdjecieAutora.get(id))) {
+                    if (ostatniKomentarzAutora.get(id) != null
+                        && ostatnieZdjecieAutora.get(id) != null 
+                        && ostatniKomentarzAutora.get(id).before(ostatnieZdjecieAutora.get(id)))
+                    {
                         dodatkoweInfo =
                             " (przed zdjęciem z dnia "
                             + dw.formatujDate(ostatnieZdjecieAutora.get(id))
