@@ -25,7 +25,7 @@ package jfgs.narzedzia;
  */
 public class Constants {
 
-    public static final String version = "v1.4";
+    public static final String version = "v1.4.1";
     public static final String name = "JFlickrGroupStats";
     public static final String title = name + " " + version;
 
