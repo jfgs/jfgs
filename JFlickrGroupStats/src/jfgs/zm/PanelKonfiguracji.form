@@ -102,7 +102,6 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="cbKostkaMiniatur">
       <Properties>
-        <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Drukuj kostk&#x119; miniatur"/>
       </Properties>
     </Component>
@@ -131,7 +130,6 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="cbBezKomentarzy">
       <Properties>
-        <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Drukuj brak komentarzy w ci&#x105;gu"/>
       </Properties>
       <Events>
@@ -140,7 +138,6 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="cbBezZdjec">
       <Properties>
-        <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Drukuj brak zdj&#x119;&#x107; w ci&#x105;gu"/>
       </Properties>
       <Events>
