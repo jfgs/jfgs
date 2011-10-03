@@ -515,6 +515,8 @@ public class ZdjecieMiesiaca implements ILogika {
         HashMap<String, String>
             komentowaliJuz = new HashMap<String, String>();
 
+        int komentarzeZGrupy = 0;
+
         /*
          * Zliczanie komentarzy autora
          */
@@ -558,6 +560,9 @@ public class ZdjecieMiesiaca implements ILogika {
                          * posiadającego zdjęcia w interesującym nas okresie
                          * więc go pomijamy
                          */
+
+                        komentarzeZGrupy++;
+
                         continue;
 
                     } else {
@@ -574,6 +579,7 @@ public class ZdjecieMiesiaca implements ILogika {
                          */
                         if (!komentowalJuz) {
                             komentowaliJuz.put(komentarz.getAuthor(), "");
+                            komentarzeZGrupy++;
                         }
 
                         /*
@@ -597,7 +603,7 @@ public class ZdjecieMiesiaca implements ILogika {
 
         } // komentarze
 
-        return komentarze.size();
+        return komentarzeZGrupy;
 
     }
 
@@ -630,7 +636,10 @@ public class ZdjecieMiesiaca implements ILogika {
          */
         {
 
-            int kz = 0;
+            //int kz = 0;
+            int liczbaKomentarzy[] = new int[zdjecia.length];
+            double srLiczbaKomentarzy = 0;
+            int zdjecDoSredniej = 0;
 
             final CommentsInterface ci = f.getCommentsInterface();
 
@@ -638,6 +647,8 @@ public class ZdjecieMiesiaca implements ILogika {
 
             // nie wszystkie zdjęcia drukujemy
             int drukowaneZdjecie = 1;
+
+
 
             /*
              * Główna pętla po wszystkich zdjęciach
@@ -660,7 +671,7 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 }
 
-                kz =
+                liczbaKomentarzy[noZdjecia] =
                     policzKomentarzeZdjecia(
                         zdjecia[noZdjecia].getId(),
                         zdjecia[noZdjecia].getDateAdded(),                        
@@ -673,94 +684,135 @@ public class ZdjecieMiesiaca implements ILogika {
                         extDataOd,
                         uzytkownicy);
 
-                if (zdjecia[noZdjecia].getDateAdded().before(dataOd)) {
+                if (!zdjecia[noZdjecia].getDateAdded().before(dataOd)) {
+
+                    //if (liczbaKomentarzy[noZdjecia] > 0) {
+
+                        srLiczbaKomentarzy += liczbaKomentarzy[noZdjecia];
+
+                    //}
+                    
+                    zdjecDoSredniej++;
+
+                }
+            }
+
+            srLiczbaKomentarzy = Math.ceil(srLiczbaKomentarzy / zdjecDoSredniej);
+            String strOdrzucone = "";
+            
+            strOdrzucone = "<blockquote><u>Średnia liczba komentarzy z grupy: "
+                + ((int) srLiczbaKomentarzy)
+                + ". Zdjęcia z liczbą komentarzy równą i poniżej tego progu "
+                + "zostały automatycznie "
+                + "odrzucone</u></blockquote>";
+
+            for(int noZdjecia=0; noZdjecia<zdjecia.length; noZdjecia++) {
+
+                if (!zdjecia[noZdjecia].getDateAdded().before(dataOd)) {
 
                     // to zdjęcie jest z roszerzonego zakresu i nie
                     // będzie drukowane, było użyte tylko do analizy
                     // dat komentarzy
 
-                } else {
+                    // odrzucamy zdjęcia niepopularne, poniżej progu średniej
+                    // liczby komentarzy
 
-                    if (!nowyUkladStrony) {
+                    if (liczbaKomentarzy[noZdjecia] <= srLiczbaKomentarzy) {
 
-                        kodhtml.append(
-                            dw.formatujLiczbe(drukowaneZdjecie)
-                            + ": &lt;a href=&quot;"
-                            + zdjecia[noZdjecia].getUrl()
-                            + "&quot;&gt;&lt;img src=&quot;"
-                            + zdjecia[noZdjecia].getSmallUrl()
-                            + "&quot;&gt;&lt;/a&gt;"
-                            + "\n"
-                        );
-
-                        dw.drukujLinie(
-                            dw.formatujLiczbe(drukowaneZdjecie)
-                            + ": "
-                            + "<a href=\""
-                            + zdjecia[noZdjecia].getUrl()
-                            + "\">"
-                            + dajNazweZdjecia(zdjecia[noZdjecia].getTitle())
-                            + "</a>"
-                            + " by "
-                            + zdjecia[noZdjecia].getOwner().getUsername()
-                            + " ("
-                            + (kz == 0
-                                ? "<b>" + kz + "</b>"
-                                : "" + kz)
-                            + ")"
-                            + ", "
-                            + dw.formatujDate(zdjecia[noZdjecia].getDateAdded())
-                        );
-
+                        strOdrzucone +=
+                            "<blockquote>Komentarzy: " + liczbaKomentarzy[noZdjecia]
+                            + " <a href=\"" + zdjecia[noZdjecia].getUrl() + "\">"
+                            + zdjecia[noZdjecia].getTitle()
+                            + "</a> by " + zdjecia[noZdjecia].getOwner().getUsername()
+                            + "</blockquote>";
+                
                     } else {
 
-                        dw.drukuj(
-                            "<a href=\""
-                            + zdjecia[noZdjecia].getUrl()
-                            + "\" "
-                            + "title=\""
-                            + zdjecia[noZdjecia].getTitle()
-                            + " by "
-                            + zdjecia[noZdjecia].getOwner().getUsername()
-                            + ", on Flickr\">"
-                            + "<img src=\""
-                            + zdjecia[noZdjecia].getMediumUrl()
-                            + "\" "
-                            + "alt=\""
-                            + zdjecia[noZdjecia].getTitle()
-                            + "\" /></a>");
+                        if (!nowyUkladStrony) {
 
-                        dw.drukujLinie("<blockquote>");
+                            kodhtml.append(
+                                dw.formatujLiczbe(drukowaneZdjecie)
+                                + ": &lt;a href=&quot;"
+                                + zdjecia[noZdjecia].getUrl()
+                                + "&quot;&gt;&lt;img src=&quot;"
+                                + zdjecia[noZdjecia].getSmallUrl()
+                                + "&quot;&gt;&lt;/a&gt;"
+                                + "\n"
+                            );
 
-                        dw.drukujLinie(
-                            "Lp. "
-                            + dw.formatujLiczbe(drukowaneZdjecie)
-                            + ", \"<u>"
-                            + dajNazweZdjecia(zdjecia[noZdjecia].getTitle())                            
-                            + "</u>\" by <u>"
-                            + zdjecia[noZdjecia].getOwner().getUsername()
-                            + "</u>"
-                        );
-                        
-                        dw.drukujLinie("");
+                            dw.drukujLinie(
+                                dw.formatujLiczbe(drukowaneZdjecie)
+                                + ": "
+                                + "<a href=\""
+                                + zdjecia[noZdjecia].getUrl()
+                                + "\">"
+                                + dajNazweZdjecia(zdjecia[noZdjecia].getTitle())
+                                + "</a>"
+                                + " by "
+                                + zdjecia[noZdjecia].getOwner().getUsername()
+                                + " ("
+                                + (liczbaKomentarzy[noZdjecia] == 0
+                                    ? "<b>" + liczbaKomentarzy[noZdjecia] + "</b>"
+                                    : "" + liczbaKomentarzy[noZdjecia])
+                                + ")"
+                                + ", "
+                                + dw.formatujDate(zdjecia[noZdjecia].getDateAdded())
+                            );
 
-                        dw.drukujLinie(
-                            "<i>&lt;a href=&quot;"
-                            + zdjecia[noZdjecia].getUrl()
-                            + "&quot;&gt;\n&nbsp;&nbsp;&nbsp;&nbsp;&lt;img src=&quot;"
-                            + zdjecia[noZdjecia].getSmallUrl()
-                            + "&quot;&gt;\n&lt;/a&gt;</i>"
-                        );
+                        } else {
 
-                        dw.drukujLinie("</blockquote>");
+                            dw.drukuj(
+                                "<a href=\""
+                                + zdjecia[noZdjecia].getUrl()
+                                + "\" "
+                                + "title=\""
+                                + zdjecia[noZdjecia].getTitle()
+                                + " by "
+                                + zdjecia[noZdjecia].getOwner().getUsername()
+                                + ", on Flickr\">"
+                                + "<img src=\""
+                                + zdjecia[noZdjecia].getMediumUrl()
+                                + "\" "
+                                + "alt=\""
+                                + zdjecia[noZdjecia].getTitle()
+                                + "\" /></a>");
+
+                            dw.drukujLinie("<blockquote>");
+
+                            dw.drukujLinie(
+                                "Lp. "
+                                + dw.formatujLiczbe(drukowaneZdjecie)
+                                + ", \"<u>"
+                                + dajNazweZdjecia(zdjecia[noZdjecia].getTitle())
+                                + "</u>\" by <u>"
+                                + zdjecia[noZdjecia].getOwner().getUsername()
+                                + "</u>"
+                                + " (komentarzy " + liczbaKomentarzy[noZdjecia] + ")"
+                            );
+
+                            dw.drukujLinie("");
+
+                            dw.drukujLinie(
+                                "<i>&lt;a href=&quot;"
+                                + zdjecia[noZdjecia].getUrl()
+                                + "&quot;&gt;\n&nbsp;&nbsp;&nbsp;&nbsp;&lt;img src=&quot;"
+                                + zdjecia[noZdjecia].getSmallUrl()
+                                + "&quot;&gt;\n&lt;/a&gt;</i>"
+                            );
+
+                            dw.drukujLinie("</blockquote>");
+
+                        }
+
+                        drukowaneZdjecie++;
 
                     }
 
-                    drukowaneZdjecie++;
-
-                }
+                } 
 
             } // wszystkie wybrane zdjęcia
+
+            dw.drukujLinie(strOdrzucone);
 
             /*
              * Pasek ustawiony do końca
@@ -990,6 +1042,8 @@ public class ZdjecieMiesiaca implements ILogika {
             dw.drukujSeparator("Podgląd zdjęć");
 
             int zdjecieWKostce = 1;
+
+
 
             for(int ip=0; ip<zdjecia.length; ip++) {
 

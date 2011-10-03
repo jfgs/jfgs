@@ -67,7 +67,6 @@ public class PanelKonfiguracji extends javax.swing.JPanel implements IPanelKonfi
 
         cbPodsumowaniePopularnosci.setText("Drukuj podsumowanie popularności");
 
-        cbKostkaMiniatur.setSelected(true);
         cbKostkaMiniatur.setText("Drukuj kostkę miniatur");
 
         rgSposobPodsumowania.add(rbWykresSlupkowy);
@@ -80,7 +79,6 @@ public class PanelKonfiguracji extends javax.swing.JPanel implements IPanelKonfi
         cbKodHTML.setSelected(true);
         cbKodHTML.setText("Drukuj kod HTML");
 
-        cbBezKomentarzy.setSelected(true);
         cbBezKomentarzy.setText("Drukuj brak komentarzy w ciągu");
         cbBezKomentarzy.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -88,7 +86,6 @@ public class PanelKonfiguracji extends javax.swing.JPanel implements IPanelKonfi
             }
         });
 
-        cbBezZdjec.setSelected(true);
         cbBezZdjec.setText("Drukuj brak zdjęć w ciągu");
         cbBezZdjec.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
