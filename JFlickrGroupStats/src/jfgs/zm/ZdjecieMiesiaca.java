@@ -707,14 +707,14 @@ public class ZdjecieMiesiaca implements ILogika {
                 + "odrzucone</u></blockquote>";
 
             dw.drukujLinie(
-                "\n\n"
+                "\n"
                 + "<u>W tym miesiącu wybieramy spośród "
                 + zdjecDoSredniej
-                + " zdjęć, zgodnie z regulaminem można oddać do "
+                + " zdjęć, zgodnie z regulaminem można <b>oddać do "
                 + ((((int) zdjecDoSredniej) / 10) + 1)
-                + " głosów głównych oraz do "
+                + "</b> głosów głównych oraz <b>do "
                 + ((((int) zdjecDoSredniej) / 10) + 1)
-                + " wyróżnień.</u>\n");
+                + " wyróżnień</b>.</u>\n");
 
             for(int noZdjecia=0; noZdjecia<zdjecia.length; noZdjecia++) {
 
@@ -850,17 +850,7 @@ public class ZdjecieMiesiaca implements ILogika {
          */
         if (dodajPodsumowanieZbiorcze) {
 
-            dw.drukujNaglowek("Podsumowanie");
-
-            dw.drukujLinie(
-                  "Wykres poniżej prezentuje liczbę dodanych do grupy zdjęć do"
-                + " liczby szczerych komentarzy (<i>zdjęcia</i> / <i>komentarze</i>). "
-                + "Komentarze autora"
-                + " pod własnym zdjęciem nie są liczone. Kolejne "
-                + "komentarze pod cudzym zdjęciem liczone są jako 1/10 "
-                + "punkta. Jeżeli wynik końcowy jest ujemny oznacza to, że"
-                + " dany użytkownik dodał więcej zdjęć niż szczerych komentarzy.");
-            dw.drukujLinie("");
+            
 
             /*
              * Przeszukanie wartości ocen wszystkich użytkowników, wyszukanie
@@ -889,6 +879,18 @@ public class ZdjecieMiesiaca implements ILogika {
             
             if (wykresSlupkowy) {
 
+                dw.drukujNaglowek("Podsumowanie");
+
+                dw.drukujLinie(
+                      "Wykres poniżej prezentuje liczbę dodanych do grupy zdjęć do"
+                    + " liczby szczerych komentarzy (<i>zdjęcia</i> / <i>komentarze</i>). "
+                    + "Komentarze autora"
+                    + " pod własnym zdjęciem nie są liczone. Kolejne "
+                    + "komentarze pod cudzym zdjęciem liczone są jako 1/10 "
+                    + "punkta. Jeżeli wynik końcowy jest ujemny oznacza to, że"
+                    + " dany użytkownik dodał więcej zdjęć niż szczerych komentarzy.");
+                dw.drukujLinie("");
+
                 StatystykaAutora.sortByWartosc();
                 Arrays.sort(sat);
                 
@@ -914,6 +916,16 @@ public class ZdjecieMiesiaca implements ILogika {
 
             } else if(wykresLista) {
 
+                dw.drukujNaglowek("Podsumowanie");
+
+                dw.drukujLinie(
+                      "Zestawienie poniżej prezentuje liczbę dodanych do grupy " +
+                      "szczerych komentarzy. Komentarze autora"
+                    + " pod własnym zdjęciem nie są liczone. Kolejne "
+                    + "komentarze pod cudzym zdjęciem liczone są jako 1/10 "
+                    + "punkta.");
+                dw.drukujLinie("");
+
                 StatystykaAutora.sortByKomentarze();
                 Arrays.sort(sat);
 
@@ -927,10 +939,6 @@ public class ZdjecieMiesiaca implements ILogika {
                 }
 
                 int no = 1;
-
-                dw.drukujLinie(
-                    "Wszystkich komentarzy w miesiącu: "
-                    + ws.getFormat().format(calkowitaLiczbaKomentarzy));
 
                 for (StatystykaAutora sa : sat) {
 
@@ -1577,7 +1585,7 @@ public class ZdjecieMiesiaca implements ILogika {
         /*
          * Ostatni separator przed zamknięciem pliku
          */
-        dw.drukujSeparator();
+        dw.drukujLinie("");
 
         try {
             dw.zamknijPlik();
