@@ -70,10 +70,10 @@ public class PanelKonfiguracji extends javax.swing.JPanel implements IPanelKonfi
         cbKostkaMiniatur.setText("Drukuj kostkę miniatur");
 
         rgSposobPodsumowania.add(rbWykresSlupkowy);
-        rbWykresSlupkowy.setSelected(true);
         rbWykresSlupkowy.setText("Wykres słupkowy");
 
         rgSposobPodsumowania.add(rbLista);
+        rbLista.setSelected(true);
         rbLista.setText("Lista wartości");
 
         cbKodHTML.setSelected(true);
