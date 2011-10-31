@@ -29,6 +29,22 @@ public class StatystykaAutora implements Comparable<StatystykaAutora> {
     private double dodanychZdjec;
     private double dodanychKomentarzy;
     
+    private static boolean sortByWartosc = true;
+    
+    /*
+     * Sortuj wg liczby komentarzy i zdjęć
+     */
+    public static void sortByWartosc() {
+        sortByWartosc = true;
+    }
+
+    /*
+     * Sortuj wg liczby komentarzy
+     */
+    public static void sortByKomentarze() {
+        sortByWartosc = false;
+    }
+
     public StatystykaAutora(double k, double z, String nazwa) {
         dodanychKomentarzy = k;
         dodanychZdjec = z;
@@ -68,12 +84,22 @@ public class StatystykaAutora implements Comparable<StatystykaAutora> {
     }
     
     public int compareTo(StatystykaAutora o) {
-        if (o.dajWartosc() < dajWartosc()) {
-            return -1;
-        } else if (o.dajWartosc() > dajWartosc()) {
-            return 1;
+        if (sortByWartosc) {
+            if (o.dajWartosc() < dajWartosc()) {
+                return -1;
+            } else if (o.dajWartosc() > dajWartosc()) {
+                return 1;
+            } else {
+                return 0;
+            }
         } else {
-            return 0;
+            if (o.dajLiczbeKomentarzy() < dajLiczbeKomentarzy()) {
+                return -1;
+            } else if (o.dajLiczbeKomentarzy() > dajLiczbeKomentarzy()) {
+                return 1;
+            } else {
+                return 0;
+            }
         }
     }
     

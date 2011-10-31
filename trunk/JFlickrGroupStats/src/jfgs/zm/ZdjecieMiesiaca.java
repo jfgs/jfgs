@@ -176,7 +176,7 @@ public class ZdjecieMiesiaca implements ILogika {
     ) throws IOException, SAXException, FlickrException
     {
 
-        dw.drukujSeparator("Analizowane zdjęcia");
+        //dw.drukujSeparator("Analizowane zdjęcia");
 
         PoolsInterface pi = f.getPoolsInterface();
 
@@ -553,12 +553,12 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 } else {
 
-                    if (!autorzy.containsKey(komentarz.getAuthor())) {
+                    if (!uzytkownicy.containsKey(komentarz.getAuthor())) {
 
                         /*
-                         * Komentarz napisany przez użytkownika nie
-                         * posiadającego zdjęcia w interesującym nas okresie
-                         * więc go pomijamy
+                         * Komentarz napisany przez kogoś spoza grupy, teraz
+                         * doliczamy także komentarz grupowiczów, którzy nie
+                         * dodali zdjęcia w okresie
                          */
 
                         komentarzeZGrupy++;
@@ -706,6 +706,16 @@ public class ZdjecieMiesiaca implements ILogika {
                 + "zostały automatycznie "
                 + "odrzucone</u></blockquote>";
 
+            dw.drukujLinie(
+                "\n\n"
+                + "<u>W tym miesiącu wybieramy spośród "
+                + zdjecDoSredniej
+                + " zdjęć, zgodnie z regulaminem można oddać do "
+                + ((((int) zdjecDoSredniej) / 10) + 1)
+                + " głosów głównych oraz do "
+                + ((((int) zdjecDoSredniej) / 10) + 1)
+                + " wyróżnień.</u>\n");
+
             for(int noZdjecia=0; noZdjecia<zdjecia.length; noZdjecia++) {
 
                 if (!zdjecia[noZdjecia].getDateAdded().before(dataOd)) {
@@ -722,7 +732,8 @@ public class ZdjecieMiesiaca implements ILogika {
                         strOdrzucone +=
                             "<blockquote>Komentarzy: " + liczbaKomentarzy[noZdjecia]
                             + " <a href=\"" + zdjecia[noZdjecia].getUrl() + "\">"
-                            + zdjecia[noZdjecia].getTitle()
+                            + ("".equals(zdjecia[noZdjecia].getTitle())
+                                ? "(bez nazwy)" : zdjecia[noZdjecia].getTitle())
                             + "</a> by " + zdjecia[noZdjecia].getOwner().getUsername()
                             + "</blockquote>";
                 
@@ -875,9 +886,11 @@ public class ZdjecieMiesiaca implements ILogika {
 
             StatystykaAutora[] sat = new StatystykaAutora[aktywnosc.size()];
             aktywnosc.values().toArray(sat);
-            Arrays.sort(sat);
-
+            
             if (wykresSlupkowy) {
+
+                StatystykaAutora.sortByWartosc();
+                Arrays.sort(sat);
                 
                 final WykresSlupkowy ws = new WykresSlupkowy();
 
@@ -901,28 +914,53 @@ public class ZdjecieMiesiaca implements ILogika {
 
             } else if(wykresLista) {
 
+                StatystykaAutora.sortByKomentarze();
+                Arrays.sort(sat);
+
                 final String separator = "; ";
                 final WykresSlupkowy ws = new WykresSlupkowy();
 
+                double calkowitaLiczbaKomentarzy = 0;
+
+                for (StatystykaAutora sa : sat) {
+                    calkowitaLiczbaKomentarzy += sa.dajLiczbeKomentarzy();
+                }
+
+                int no = 1;
+
                 dw.drukujLinie(
-                    "Nazwa" + separator +
-                    "Liczba zdjęć" + separator +
-                    "Liczba komentarzy" + separator +
-                    "Wartość");
+                    "Wszystkich komentarzy w miesiącu: "
+                    + ws.getFormat().format(calkowitaLiczbaKomentarzy));
 
                 for (StatystykaAutora sa : sat) {
 
-                    dw.drukujLinie(
-                        sa.dajNazwe()
-                        + separator
-                        + ws.getFormat().format(sa.dajLiczbeZdjec())
-                        + separator
-                        + ws.getFormat().format(sa.dajLiczbeKomentarzy())
-                        + separator
-                        + "<b>"
-                        + ws.getFormat().format(sa.dajWartosc())
-                        + "</b>"
-                    );
+                    /*
+                     * Pokazujemy tylko tych, którzy byli aktywni w danym
+                     * okresie. 
+                     */
+                    if (sa.dajLiczbeKomentarzy() != 0
+                        || sa.dajLiczbeZdjec() != 0)
+                    {
+                        dw.drukujLinie(
+                            no + ". "
+                            + ws.getFormat().format(sa.dajLiczbeKomentarzy())
+                            +" komentarzy ("
+                            + ws.getFormat().format(
+                                    (double) sa.dajLiczbeKomentarzy()
+                                        / calkowitaLiczbaKomentarzy * 100)
+                            + "%) - "
+                            + sa.dajNazwe()
+                        );
+                    }
+
+                    no++;
+
+                    /*
+                     * Drukujemy pierwszą dziesiątkę
+                     */
+                    if (no>10) {
+                        break;
+                    }
 
                 }
 
@@ -1369,16 +1407,16 @@ public class ZdjecieMiesiaca implements ILogika {
              */
             {
 
-                dw.drukujNaglowek(kgui.getNazwaGrupy());
+                //dw.drukujNaglowek(kgui.getNazwaGrupy());
 
-                dw.drukujLinie(
-                    "Zdjęcia dodane od "
-                    + dw.formatujDate(dataOd)
-                    + " i przed "
-                    + dw.formatujDate(dataDo)
-                    + ".");
+                //dw.drukujLinie(
+                //    "Zdjęcia dodane od "
+                //    + dw.formatujDate(dataOd)
+                //    + " i przed "
+                //    + dw.formatujDate(dataDo)
+                //    + ".");
 
-                dw.drukujSeparator();
+                //dw.drukujSeparator();
 
                 dw.drukujLinie(
                     "Jak co miesiąc zapraszam do głosowania na zdjęcie " +
@@ -1394,7 +1432,7 @@ public class ZdjecieMiesiaca implements ILogika {
                     "/zdj%C4%99ciemiesi%C4%85cagrupyszczerekomentarze/\">Zdjęcie miesiąca grupy " +
                     "Szczere komentarze</a>\".");
 
-                dw.drukujSeparator();
+                //dw.drukujSeparator();
 
             }
 
@@ -1404,6 +1442,25 @@ public class ZdjecieMiesiaca implements ILogika {
              */
             final HashMap<String, StatystykaAutora>
                 aktywnosc = new HashMap<String, StatystykaAutora>();
+
+            /*
+             * tak aby w statystyce nie pominąć użytkowników bez zdjęć, którzy
+             * też mogli komentować
+             */
+           {
+                Iterator<String> i = uzytkownicy.keySet().iterator();
+                while(i.hasNext()) {
+                    String id = i.next();
+                    aktywnosc.put(
+                        id,
+                        new StatystykaAutora(
+                            0,
+                            0, 
+                            uzytkownicy.get(id)
+                        )
+                    );
+                }
+            }
 
             /*
              * Data początku rozszerzonego zakresu do analizy
