@@ -698,23 +698,7 @@ public class ZdjecieMiesiaca implements ILogika {
             }
 
             srLiczbaKomentarzy = Math.floor(srLiczbaKomentarzy / zdjecDoSredniej);
-            String strOdrzucone = "";
-            
-            strOdrzucone = "<blockquote><u>Średnia liczba komentarzy z grupy: "
-                + ((int) srLiczbaKomentarzy)
-                + ". Zdjęcia z liczbą komentarzy równą i poniżej tego progu "
-                + "zostały automatycznie "
-                + "odrzucone</u></blockquote>";
-
-            dw.drukujLinie(
-                "\n"
-                + "<u>W tym miesiącu wybieramy spośród "
-                + zdjecDoSredniej
-                + " zdjęć, zgodnie z regulaminem można <b>oddać do "
-                + ((((int) zdjecDoSredniej) / 10) + 1)
-                + "</b> głosów głównych oraz <b>do "
-                + ((((int) zdjecDoSredniej) / 10) + 1)
-                + " wyróżnień</b>.</u>\n");
+            int liczbaZdjecPowyzejSredniej = 0;
 
             for(int noZdjecia=0; noZdjecia<zdjecia.length; noZdjecia++) {
 
@@ -726,6 +710,47 @@ public class ZdjecieMiesiaca implements ILogika {
 
                     // odrzucamy zdjęcia niepopularne, poniżej progu średniej
                     // liczby komentarzy
+
+                    if (!(liczbaKomentarzy[noZdjecia] <= srLiczbaKomentarzy)) {
+                        liczbaZdjecPowyzejSredniej++;
+                    }
+                }
+            }
+
+            String strOdrzucone = "";
+            
+            strOdrzucone = "<blockquote><u>Średnia liczba komentarzy z grupy: "
+                + ((int) srLiczbaKomentarzy)
+                + ". Zdjęcia z liczbą komentarzy równą i poniżej tego progu "
+                + "zostały automatycznie "
+                + "odrzucone ("
+                + (zdjecDoSredniej - liczbaZdjecPowyzejSredniej)
+                +" zdjęć).</u></blockquote>";
+
+            int glosy = ((((int) liczbaZdjecPowyzejSredniej - 1) / 10) + 1);
+
+            dw.drukujLinie((
+                    "\n"
+                    + "<u>W tym miesiącu wybieramy spośród "
+                    + liczbaZdjecPowyzejSredniej
+                    + " zdjęć, zgodnie z regulaminem można <b>oddać "
+                    + glosy
+                    + "</b>"
+                    + ((glosy == 1 ? " głos główny" : ""))
+                    + ((glosy >= 2 && glosy <= 4 ? " głosy główne" : ""))
+                    + ((glosy >= 5 ? " głosów głównych" : ""))
+                    + " oraz <b>"
+                    + glosy
+                    + ((glosy == 1 ? " wyróżnienie" : ""))
+                    + ((glosy >= 2 && glosy <= 4 ? " wyróżnienia" : ""))
+                    + ((glosy >= 5 ? " wyróżnień" : ""))
+                    + "</b>.</u>\n"
+                ).toUpperCase());
+
+            // powtrzamy pętle jeszcze raz
+            for(int noZdjecia=0; noZdjecia<zdjecia.length; noZdjecia++) {
+
+                if (!zdjecia[noZdjecia].getDateAdded().before(dataOd)) {
 
                     if (liczbaKomentarzy[noZdjecia] <= srLiczbaKomentarzy) {
 
@@ -823,7 +848,7 @@ public class ZdjecieMiesiaca implements ILogika {
 
             } // wszystkie wybrane zdjęcia
 
-            dw.drukujLinie(strOdrzucone);
+            dw.drukuj(strOdrzucone);
 
             /*
              * Pasek ustawiony do końca
@@ -916,7 +941,7 @@ public class ZdjecieMiesiaca implements ILogika {
 
             } else if(wykresLista) {
 
-                dw.drukujNaglowek("Podsumowanie");
+                dw.drukujNaglowek("Top10");
 
                 dw.drukujLinie(
                       "Zestawienie poniżej prezentuje liczbę dodanych do grupy " +
@@ -949,15 +974,16 @@ public class ZdjecieMiesiaca implements ILogika {
                     if (sa.dajLiczbeKomentarzy() != 0
                         || sa.dajLiczbeZdjec() != 0)
                     {
-                        dw.drukujLinie(
-                            no + ". "
-                            + ws.getFormat().format(sa.dajLiczbeKomentarzy())
-                            +" komentarzy ("
-                            + ws.getFormat().format(
-                                    (double) sa.dajLiczbeKomentarzy()
-                                        / calkowitaLiczbaKomentarzy * 100)
-                            + "%) - "
+                        dw.drukujLinie(                                                        
+                            ws.getFormat().format(
+                                    (int) Math.round(
+                                        (double) sa.dajLiczbeKomentarzy()
+                                        / calkowitaLiczbaKomentarzy * 100))
+                            + "% - "
                             + sa.dajNazwe()
+                            + ", "
+                            + ws.getFormat().format(sa.dajLiczbeKomentarzy())
+                            +" komentarzy"
                         );
                     }
 
