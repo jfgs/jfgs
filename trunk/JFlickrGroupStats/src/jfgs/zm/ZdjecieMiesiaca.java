@@ -32,6 +32,7 @@ import com.aetrion.flickr.photos.comments.CommentsInterface;
 import java.util.Collection;
 import java.util.HashMap;
 import com.aetrion.flickr.photos.comments.Comment;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -974,11 +975,14 @@ public class ZdjecieMiesiaca implements ILogika {
                     if (sa.dajLiczbeKomentarzy() != 0
                         || sa.dajLiczbeZdjec() != 0)
                     {
+                        NumberFormat f = ws.getFormat();
+                        f.setMinimumIntegerDigits(2);
+
                         dw.drukujLinie(                                                        
-                            ws.getFormat().format(
-                                    (int) Math.round(
-                                        (double) sa.dajLiczbeKomentarzy()
-                                        / calkowitaLiczbaKomentarzy * 100))
+                            f.format(
+                                (int) Math.round(
+                                    (double) sa.dajLiczbeKomentarzy()
+                                    / calkowitaLiczbaKomentarzy * 100))
                             + "% - "
                             + sa.dajNazwe()
                             + ", "
