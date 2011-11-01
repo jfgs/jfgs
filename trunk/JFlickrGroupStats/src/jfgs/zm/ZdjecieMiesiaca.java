@@ -697,7 +697,7 @@ public class ZdjecieMiesiaca implements ILogika {
                 }
             }
 
-            srLiczbaKomentarzy = Math.ceil(srLiczbaKomentarzy / zdjecDoSredniej);
+            srLiczbaKomentarzy = Math.floor(srLiczbaKomentarzy / zdjecDoSredniej);
             String strOdrzucone = "";
             
             strOdrzucone = "<blockquote><u>Średnia liczba komentarzy z grupy: "
