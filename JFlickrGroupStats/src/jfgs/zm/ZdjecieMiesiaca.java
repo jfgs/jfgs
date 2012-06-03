@@ -712,7 +712,7 @@ public class ZdjecieMiesiaca implements ILogika {
                     // odrzucamy zdjęcia niepopularne, poniżej progu średniej
                     // liczby komentarzy
 
-                    if (!(liczbaKomentarzy[noZdjecia] <= srLiczbaKomentarzy)) {
+                    if (!(liczbaKomentarzy[noZdjecia] < srLiczbaKomentarzy)) {
                         liczbaZdjecPowyzejSredniej++;
                     }
                 }
@@ -722,7 +722,7 @@ public class ZdjecieMiesiaca implements ILogika {
             
             strOdrzucone = "<blockquote><u>Średnia liczba komentarzy z grupy: "
                 + ((int) srLiczbaKomentarzy)
-                + ". Zdjęcia z liczbą komentarzy równą i poniżej tego progu "
+                + ". Zdjęcia z liczbą komentarzy poniżej tego progu "
                 + "zostały automatycznie "
                 + "odrzucone ("
                 + (zdjecDoSredniej - liczbaZdjecPowyzejSredniej)
@@ -753,7 +753,7 @@ public class ZdjecieMiesiaca implements ILogika {
 
                 if (!zdjecia[noZdjecia].getDateAdded().before(dataOd)) {
 
-                    if (liczbaKomentarzy[noZdjecia] <= srLiczbaKomentarzy) {
+                    if (liczbaKomentarzy[noZdjecia] < srLiczbaKomentarzy) {
 
                         strOdrzucone +=
                             "<blockquote>Komentarzy: " + liczbaKomentarzy[noZdjecia]
