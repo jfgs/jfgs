@@ -6,7 +6,9 @@ added under photos. Summary show which user uploading photos without commenting
 photos of other users.
 
 JFlickrGroupStats
-http://code.google.com/p/jfgs/
+
+Formerly hosted on Google Code: http://code.google.com/p/jfgs/, migrated to GitHub. 
+https://github.com/jfgs/jfgs/tree/master/JFlickrGroupStats
 
 COPYING
 
@@ -22,8 +24,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
 
 CREDITS
 
